@@ -3,12 +3,12 @@
 <head>
   <meta charset="UTF-8" />
   <title>NutriGuard AI</title>
-  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <link rel="stylesheet" href="/static/style.css">
   <meta name="viewport" content="width=device-width,initial-scale=1" />
 </head>
 <body>
 
-  <!-- Right-side language selector (visible, sticky) -->
+  <!-- Right-side language selector -->
   <div class="lang-picker" id="langPicker" aria-label="Language picker">
     <button id="langBtn" title="Choose language" aria-haspopup="true" aria-expanded="false">
       <span class="lang-flag" id="langFlag">🌐</span>
@@ -50,320 +50,194 @@
       <div class="controls">
         <button id="addBtn">➕ Add Another Food</button>
         <button id="analyzeBtn">Analyze 🍽️</button>
-        <button id="consultBtn" style="display: none;">Consult with AI 🤖</button>
       </div>
     </div>
 
     <div id="output" class="output-section" aria-live="polite"></div>
   </div>
 
+  <!-- Simple Chat Widget -->
+  <div id="chat-widget" style="position: fixed; right: 20px; bottom: 20px; width: 350px; height: 500px; background: white; border-radius: 15px; box-shadow: 0 5px 25px rgba(0,0,0,0.2); display: flex; flex-direction: column; z-index: 1000; border: 1px solid #e0e0e0;">
+    <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 15px; border-radius: 15px 15px 0 0; display: flex; justify-content: space-between; align-items: center;">
+      <h3 style="margin: 0; font-size: 16px;">🤖 AI Dietician Assistant</h3>
+      <button id="chat-toggle" style="background: none; border: none; color: white; font-size: 18px; cursor: pointer;">−</button>
+    </div>
+    <div id="chat-messages" style="flex: 1; padding: 15px; overflow-y: auto; background: #f8f9fa;">
+      <div style="margin-bottom: 10px; padding: 10px 15px; border-radius: 18px; max-width: 80%; line-height: 1.4; background: white; border: 1px solid #e0e0e0; border-bottom-left-radius: 4px;">
+        👋 Hello! I'm your AI Dietician. Analyze your nutrition first, then I can give you personalized advice!
+      </div>
+    </div>
+    <div style="display: flex; padding: 15px; border-top: 1px solid #e0e0e0; background: white;">
+      <input type="text" id="chat-input" placeholder="Ask about nutrition..." style="flex: 1; padding: 12px 15px; border: 1px solid #ddd; border-radius: 25px; outline: none; font-size: 14px;">
+      <button id="chat-send" style="background: #007bff; color: white; border: none; padding: 12px 20px; border-radius: 25px; margin-left: 10px; cursor: pointer; font-size: 14px;">Send</button>
+    </div>
+    <div style="display: flex; padding: 10px; background: #f8f9fa; border-top: 1px solid #e0e0e0; gap: 5px; flex-wrap: wrap;">
+      <button class="suggestion-btn" data-prompt="What should I eat for breakfast?" style="background: #e9ecef; border: 1px solid #dee2e6; border-radius: 15px; padding: 8px 12px; font-size: 12px; cursor: pointer; flex: 1; min-width: 80px; text-align: center;">🍳 Breakfast</button>
+      <button class="suggestion-btn" data-prompt="Suggest a meal plan" style="background: #e9ecef; border: 1px solid #dee2e6; border-radius: 15px; padding: 8px 12px; font-size: 12px; cursor: pointer; flex: 1; min-width: 80px; text-align: center;">📋 Meal Plan</button>
+      <button class="suggestion-btn" data-prompt="How to improve protein intake?" style="background: #e9ecef; border: 1px solid #dee2e6; border-radius: 15px; padding: 8px 12px; font-size: 12px; cursor: pointer; flex: 1; min-width: 80px; text-align: center;">💪 Protein</button>
+    </div>
+  </div>
+
 <script>
-/* ============================
-   Full client-side localization
-   ============================ */
-
-/* Translation dictionaries:
-   - UI strings
-   - nutrient labels mapping
-   - food name translations (recommendations)
-*/
-const translations = {
-  en: {
-    code: "EN", flag: "🌐",
-    title: "🥗 NutriGuard AI — Smart Nutrition Recommender",
-    heightPlaceholder: "Height (cm)",
-    weightPlaceholder: "Weight (kg)",
-    cityPlaceholder: "Enter your city",
-    namePlaceholder: "Food name",
-    qtyPlaceholder: "Qty (g)",
-    qtyTip: "Tip: Qty is interpreted as <strong>grams</strong> (e.g. 200 for 200g).",
-    addFood: "➕ Add Another Food",
-    analyze: "Analyze 🍽️",
-    consult_ai: "Consult with AI 🤖",
-    weatherHeading: (city) => `✅ Weather in ${city}`,
-    totalNutrients: "📊 Total Nutrients:",
-    deficient: "🧩 Deficient Nutrients:",
-    allBalanced: "🎉 All nutrients balanced!",
-    recommendations: "🍴 Recommended Foods & Nutrients:",
-    consultation_summary: "📝 AI Summary:",
-    consultation_meal_plan: "🥗 AI Meal Plan:",
-    consultation_advice: "💡 AI General Advice:",
-    errorPrefix: "❌",
-    need_more: (nutrient, value) => `${nutrient}: need ${value} more`,
-    nutrients: {
-      "Protein": "Protein",
-      "Vitamin C": "Vitamin C",
-      "Iron": "Iron",
-      "Calcium": "Calcium",
-      "Fiber": "Fiber"
-    },
-    foods: {
-      "Chicken": "Chicken",
-      "Eggs": "Eggs",
-      "Paneer": "Paneer",
-      "Oats": "Oats",
-      "Apple": "Apple",
-      "Carrots": "Carrots",
-      "Orange": "Orange",
-      "Guava": "Guava",
-      "Kiwi": "Kiwi",
-      "Spinach": "Spinach",
-      "Liver": "Liver",
-      "Beans": "Beans",
-      "Milk": "Milk",
-      "Curd": "Curd",
-      "Almonds": "Almonds"
-    }
-  },
-  hi: {
-    code: "HI", flag: "🌏",
-    title: "🥗 NutriGuard AI — स्मार्ट पोषण सुझावक",
-    heightPlaceholder: "ऊँचाई (सेमी)",
-    weightPlaceholder: "वजन (किलो)",
-    cityPlaceholder: "अपने शहर का नाम डालें",
-    namePlaceholder: "खाद्य नाम",
-    qtyPlaceholder: "मात्रा (ग्राम)",
-    qtyTip: "सूचना: मात्रा ग्राम में है (उदा., 200 = 200g)।",
-    addFood: "➕ और एक जोड़ें",
-    analyze: "विश्लेषण करें 🍽️",
-    consult_ai: "AI से सलाह लें 🤖",
-    weatherHeading: (city) => `✅ मौसम — ${city}`,
-    totalNutrients: "📊 कुल पोषक तत्व:",
-    deficient: "🧩 कम पोषक तत्व:",
-    allBalanced: "🎉 सभी पोषक तत्व संतुलित हैं!",
-    recommendations: "🍴 सुझाए गए खाद्य पदार्थ और पोषक तत्व:",
-    consultation_summary: "📝 AI सारांश:",
-    consultation_meal_plan: "🥗 AI भोजन योजना:",
-    consultation_advice: "💡 AI सामान्य सलाह:",
-    errorPrefix: "❌",
-    need_more: (nutrient, value) => `${nutrient}: आवश्यकता ${value} अधिक`,
-    nutrients: {
-      "Protein": "प्रोटीन",
-      "Vitamin C": "विटामिन C",
-      "Iron": "आयरन",
-      "Calcium": "कैल्शियम",
-      "Fiber": "फाइबर"
-    },
-    foods: {
-      "Chicken": "चिकन",
-      "Eggs": "अंडे",
-      "Paneer": "पनीर",
-      "Oats": "ओट्स",
-      "Apple": "सेब",
-      "Carrots": "गाजर",
-      "Orange": "संतरा",
-      "Guava": "पेरिच / अमरूद", // regional variant ok
-      "Kiwi": "कीवी",
-      "Spinach": "पालक",
-      "Liver": "लीवर",
-      "Beans": "बीन्स",
-      "Milk": "दूध",
-      "Curd": "दही",
-      "Almonds": "बादाम"
-    }
-  },
-  te: {
-    code: "TE", flag: "🌏",
-    title: "🥗 NutriGuard AI — స్మార్ట్ పోషణ సలహాదారు",
-    heightPlaceholder: "ఎత్తు (సెం.మీ)",
-    weightPlaceholder: "బరువు (kg)",
-    cityPlaceholder: "మీ నగరాన్ని నమోదు చేయండి",
-    namePlaceholder: "ఆహార పేరు",
-    qtyPlaceholder: "మొత్తం (గ్రాములు)",
-    qtyTip: "గమనిక: పరిమాణం గ్రాముల్లో (ఉదా., 200 = 200g).",
-    addFood: "➕ మరొకటి జోడించండి",
-    analyze: "విశ్లేషించు 🍽️",
-    consult_ai: "AI ని సంప్రదించండి 🤖",
-    weatherHeading: (city) => `✅ వాతావరణం — ${city}`,
-    totalNutrients: "📊 మొత్తం పోషకాలు:",
-    deficient: "🧩 లోపాలు ఉన్న పోషకాలు:",
-    allBalanced: "🎉 అన్ని పోషకాలు సమతుల్యంగా ఉన్నవి!",
-    recommendations: "🍴 సూచించిన ఆహారాలు & పోషకాలు:",
-    consultation_summary: "📝 AI సారాంశం:",
-    consultation_meal_plan: "🥗 AI భోజన ప్రణాళిక:",
-    consultation_advice: "💡 AI సాధారణ సలహా:",
-    errorPrefix: "❌",
-    need_more: (nutrient, value) => `${nutrient}: అవసరం ${value} ఎక్కువ`,
-    nutrients: {
-      "Protein": "ప్రోటీన్",
-      "Vitamin C": "విటమిన్ C",
-      "Iron": "ఐరన్",
-      "Calcium": "కాల్షియం",
-      "Fiber": "ఫైబర్"
-    },
-    foods: {
-      "Chicken": "చికెన్",
-      "Eggs": "గుడ్లు",
-      "Paneer": "పనీరు",
-      "Oats": "ఓట్స్",
-      "Apple": "ఆపిల్",
-      "Carrots": "క్యారెట్",
-      "Orange": "ఆరెంజ్",
-      "Guava": "పెరుగు / జామ",
-      "Kiwi": "కివి",
-      "Spinach": "పాలకూర",
-      "Liver": "లివర్",
-      "Beans": "బీన్స్",
-      "Milk": "పాల",
-      "Curd": "తయాంబు / పెరుగు",
-      "Almonds": "బాదాం"
-    }
+// Simple Chat Functionality
+function addChatMessage(text, sender) {
+  const chatMessages = document.getElementById("chat-messages");
+  if (!chatMessages) {
+    console.log('Chat messages not found');
+    return;
   }
-};
-
-/* Persisted language in localStorage */
-const LS_KEY = "nutri_lang";
-let currentLang = localStorage.getItem(LS_KEY) || "en";
-let currentAnalysisData = null;
-
-/* Helpers to get translations easily */
-function t(key) {
-  return translations[currentLang][key];
+  
+  const messageDiv = document.createElement("div");
+  messageDiv.style.marginBottom = '10px';
+  messageDiv.style.padding = '10px 15px';
+  messageDiv.style.borderRadius = '18px';
+  messageDiv.style.maxWidth = '80%';
+  messageDiv.style.lineHeight = '1.4';
+  messageDiv.style.wordWrap = 'break-word';
+  
+  if (sender === 'user') {
+    messageDiv.style.background = '#007bff';
+    messageDiv.style.color = 'white';
+    messageDiv.style.marginLeft = 'auto';
+    messageDiv.style.borderBottomRightRadius = '4px';
+  } else {
+    messageDiv.style.background = 'white';
+    messageDiv.style.color = '#333';
+    messageDiv.style.border = '1px solid #e0e0e0';
+    messageDiv.style.borderBottomLeftRadius = '4px';
+  }
+  
+  messageDiv.textContent = text;
+  chatMessages.appendChild(messageDiv);
+  chatMessages.scrollTop = chatMessages.scrollHeight;
+  return messageDiv;
 }
-function trNutrient(key) {
-  return translations[currentLang].nutrients[key] || key;
+
+async function sendChatMessage(message) {
+  if (!message.trim()) return;
+
+  // Add user message
+  addChatMessage(message, 'user');
+  
+  const chatInput = document.getElementById("chat-input");
+  const chatSend = document.getElementById("chat-send");
+  
+  if (chatInput) chatInput.value = '';
+  if (chatSend) chatSend.disabled = true;
+
+  // Show typing indicator
+  const typingIndicator = addChatMessage('AI is typing...', 'ai');
+  if (typingIndicator) {
+    typingIndicator.style.fontStyle = 'italic';
+    typingIndicator.style.color = '#666';
+  }
+
+  try {
+    const response = await fetch('/chat', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        message: message,
+        lang: 'en'
+      })
+    });
+
+    const data = await response.json();
+    
+    // Remove typing indicator
+    if (typingIndicator) typingIndicator.remove();
+    
+    // Add AI response
+    if (data.response) {
+      addChatMessage(data.response, 'ai');
+    } else if (data.reply) {
+      addChatMessage(data.reply, 'ai');
+    } else {
+      addChatMessage('Sorry, I could not process your request.', 'ai');
+    }
+  } catch (error) {
+    if (typingIndicator) typingIndicator.remove();
+    addChatMessage('Error connecting to AI service.', 'ai');
+    console.error('Chat error:', error);
+  } finally {
+    if (chatSend) chatSend.disabled = false;
+    if (chatInput) chatInput.focus();
+  }
 }
-function trFood(key) {
-  return translations[currentLang].foods[key] || key;
-}
 
-/* UI elements */
-const langBtn = document.getElementById("langBtn");
-const langMenu = document.getElementById("langMenu");
-const currentLangEl = document.getElementById("currentLang");
-const langFlagEl = document.getElementById("langFlag");
+// Initialize when page loads
+document.addEventListener('DOMContentLoaded', function() {
+  console.log('Page loaded, initializing chat...');
+  
+  // Chat elements
+  const chatWidget = document.getElementById("chat-widget");
+  const chatToggle = document.getElementById("chat-toggle");
+  const chatInput = document.getElementById("chat-input");
+  const chatSend = document.getElementById("chat-send");
+  const suggestionBtns = document.querySelectorAll('.suggestion-btn');
 
-/* Setup language picker visible and interactive */
-function applyLangToPicker() {
-  currentLangEl.textContent = translations[currentLang].code;
-  langFlagEl.textContent = translations[currentLang].flag || "🌐";
-}
-applyLangToPicker();
+  console.log('Chat widget:', chatWidget);
+  console.log('Chat toggle:', chatToggle);
+  console.log('Chat input:', chatInput);
+  console.log('Chat send:', chatSend);
+  console.log('Suggestion buttons:', suggestionBtns.length);
 
-/* Open/close menu */
-langBtn.addEventListener("click", (e) => {
-  e.stopPropagation();
-  const expanded = langBtn.getAttribute("aria-expanded") === "true";
-  langBtn.setAttribute("aria-expanded", (!expanded).toString());
-  langMenu.hidden = !langMenu.hidden;
-});
-document.addEventListener("click", () => { langMenu.hidden = true; langBtn.setAttribute("aria-expanded","false"); });
+  if (!chatWidget) {
+    console.error('❌ Chat widget not found!');
+    return;
+  }
 
-document.querySelectorAll(".lang-option").forEach(btn => {
-  btn.addEventListener("click", () => {
-    const lang = btn.getAttribute("data-lang");
-    setLanguage(lang);
-    langMenu.hidden = true;
-    langBtn.setAttribute("aria-expanded","false");
+  console.log('✅ Chat widget found! Setting up listeners...');
+
+  // Toggle chat
+  if (chatToggle) {
+    chatToggle.addEventListener('click', function() {
+      if (chatWidget.style.height === '60px') {
+        chatWidget.style.height = '500px';
+        chatToggle.textContent = '−';
+      } else {
+        chatWidget.style.height = '60px';
+        chatToggle.textContent = '+';
+      }
+    });
+  }
+
+  // Send message
+  if (chatSend && chatInput) {
+    chatSend.addEventListener('click', function() {
+      sendChatMessage(chatInput.value);
+    });
+    
+    chatInput.addEventListener('keypress', function(e) {
+      if (e.key === 'Enter') {
+        sendChatMessage(chatInput.value);
+      }
+    });
+  }
+
+  // Suggestion buttons
+  suggestionBtns.forEach(btn => {
+    btn.addEventListener('click', function() {
+      const prompt = this.getAttribute('data-prompt');
+      sendChatMessage(prompt);
+    });
   });
+
+  console.log('✅ Chat initialized successfully!');
 });
 
-/* Apply translations to all static UI elements */
-function applyTranslations() {
-  const dict = translations[currentLang];
-  document.getElementById("title").innerHTML = dict.title;
-  document.getElementById("height").placeholder = dict.heightPlaceholder;
-  document.getElementById("weight").placeholder = dict.weightPlaceholder;
-  document.getElementById("city").placeholder = dict.cityPlaceholder;
-  document.querySelectorAll(".food-name").forEach(el => el.placeholder = dict.namePlaceholder);
-  document.querySelectorAll(".food-qty").forEach(el => el.placeholder = dict.qtyPlaceholder);
-  document.getElementById("qtyTip").innerHTML = dict.qtyTip;
-  document.getElementById("addBtn").textContent = dict.addFood;
-  document.getElementById("analyzeBtn").textContent = dict.analyze;
-  document.getElementById("consultBtn").textContent = dict.consult_ai;
-  applyLangToPicker();
-}
-
-/* Set and persist language */
-function setLanguage(lang) {
-  if (!translations[lang]) lang = "en";
-  currentLang = lang;
-  localStorage.setItem(LS_KEY, lang);
-  applyTranslations();
-}
-
-/* Initial apply */
-setLanguage(currentLang);
-
-/* Add another food row */
+// Basic app functionality
 function addFood() {
   const list = document.getElementById("food-list");
   const div = document.createElement("div");
-  div.classList.add("food-item");
+  div.className = "food-item";
   div.innerHTML = `
-    <input type="text" placeholder="${translations[currentLang].namePlaceholder}" class="food-name" />
-    <input type="number" placeholder="${translations[currentLang].qtyPlaceholder}" class="food-qty" min="1" value="100" />
+    <input type="text" placeholder="Food name" class="food-name" />
+    <input type="number" placeholder="Qty (g)" class="food-qty" min="1" value="100" />
   `;
   list.appendChild(div);
 }
 
-/* Render output fully localized */
-function escapeHtml(s){
-  return String(s).replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;").replaceAll('"',"&quot;");
-}
-
-function renderOutput(data, city) {
-  const dict = translations[currentLang];
-  const out = document.getElementById("output");
-  const weather = data.weather || null;
-  let html = "";
-
-  // Weather header (localized)
-  const weatherHeading = dict.weatherHeading(city || (weather && weather.location) || "");
-  html += `<h3>${escapeHtml(weatherHeading)}</h3>`;
-  if (weather) {
-    html += `<p>🌤 ${escapeHtml(weather.condition)}, 🌡 ${escapeHtml(String(weather.temp))}°C, 💧 ${escapeHtml(String(weather.humidity))}%</p>`;
-  }
-
-  // Total nutrients
-  html += `<h3>${dict.totalNutrients}</h3>`;
-  const totals = data.total_nutrients || {};
-  if (!Object.keys(totals).length) {
-    html += `<p>-</p>`;
-  } else {
-    html += `<ul>`;
-    for (const [k, v] of Object.entries(totals)) {
-      html += `<li><strong>${escapeHtml(trNutrient(k))}:</strong> ${escapeHtml(v)}</li>`;
-    }
-    html += `</ul>`;
-  }
-
-  // Deficiencies
-  html += `<h3>${dict.deficient}</h3>`;
-  const deficient = data.deficient || {};
-  if (!Object.keys(deficient).length) {
-    html += `<p>${dict.allBalanced}</p>`;
-  } else {
-    html += `<ul>`;
-    for (const [k, v] of Object.entries(deficient)) {
-      const label = trNutrient(k);
-      html += `<li>${escapeHtml(dict.need_more(label, v))}</li>`;
-    }
-    html += `</ul>`;
-  }
-
-  // Recommendations
-  html += `<h3>${dict.recommendations}</h3>`;
-  const recs = data.recommendations || [];
-  if (!recs.length) {
-    html += `<p>-</p>`;
-  } else {
-    html += `<ul>`;
-    recs.forEach(item => {
-      // item could be [name, amt] or [name, amt, unit] or [name, '-', '-']
-      const name = item[0] || "";
-      const amt = item[1] || "";
-      // translate food name if we have mapping
-      const nameLocal = trFood(name);
-      html += `<li>${escapeHtml(nameLocal)}${amt && amt !== "-" ? " — " + escapeHtml(amt) : ""}</li>`;
-    });
-    html += `</ul>`;
-  }
-
-  out.innerHTML = html;
-}
-
-/* POST to /analyze and render localized output */
 async function analyze() {
   const city = document.getElementById("city").value.trim();
   const gender = document.getElementById("gender").value;
@@ -379,9 +253,9 @@ async function analyze() {
     if (name) items.push({ name, qty });
   }
 
-  const payload = { city, gender, height, weight, items, lang: currentLang };
+  const payload = { city, gender, height, weight, items, lang: 'en' };
   const outEl = document.getElementById("output");
-  outEl.innerHTML = `<p>⏳ ...</p>`;
+  outEl.innerHTML = `<p>⏳ Analyzing...</p>`;
 
   try {
     const res = await fetch("/analyze", {
@@ -391,200 +265,48 @@ async function analyze() {
     });
     const data = await res.json();
     if (data.error) {
-      outEl.innerHTML = `<p style="color:red;">${escapeHtml(translations[currentLang].errorPrefix)} ${escapeHtml(data.error)}</p>`;
-      currentAnalysisData = null;
-      document.getElementById("consultBtn").style.display = "none";
+      outEl.innerHTML = `<p style="color:red;">❌ ${data.error}</p>`;
       return;
     }
-    renderOutput(data, city);
-    currentAnalysisData = data;
-    document.getElementById("consultBtn").style.display = "inline-block";
-    chatWidget.style.display = "flex"; // Show the chatbot
-  } catch (err) {
-    outEl.innerHTML = `<p style="color:red;">${escapeHtml(translations[currentLang].errorPrefix)} ${escapeHtml(err.message || String(err))}</p>`;
-    currentAnalysisData = null;
-    document.getElementById("consultBtn").style.display = "none";
-  }
-}
-
-async function consultAI() {
-  if (!currentAnalysisData) return;
-
-  const outEl = document.getElementById("output");
-  const consultBtn = document.getElementById("consultBtn");
-  consultBtn.disabled = true;
-  outEl.innerHTML += `<div id="consult-output"><p>🤖 ...</p></div>`;
-
-  const payload = {
-    ...currentAnalysisData,
-    lang: currentLang,
-    height: document.getElementById("height").value,
-    weight: document.getElementById("weight").value,
-    gender: document.getElementById("gender").value,
-  };
-
-  try {
-    const res = await fetch("/consult", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload)
-    });
-    const data = await res.json();
-    if (!data.ok) {
-      document.getElementById("consult-output").innerHTML = `<p style="color:red;">${escapeHtml(translations[currentLang].errorPrefix)} ${escapeHtml(data.error)}</p>`;
-      return;
+    
+    // Display results
+    let html = `<h3>✅ Weather in ${city}</h3>`;
+    html += `<p>🌤 ${data.weather.condition}, 🌡 ${data.weather.temp}°C, 💧 ${data.weather.humidity}%</p>`;
+    
+    html += `<h3>📊 Total Nutrients:</h3><ul>`;
+    for (const [k, v] of Object.entries(data.total_nutrients)) {
+      html += `<li><strong>${k}:</strong> ${v}</li>`;
     }
-    renderConsultation(data.consult);
-  } catch (err) {
-    document.getElementById("consult-output").innerHTML = `<p style="color:red;">${escapeHtml(translations[currentLang].errorPrefix)} ${escapeHtml(err.message || String(err))}</p>`;
-  } finally {
-    consultBtn.disabled = false;
-  }
-}
-
-function renderConsultation(consult) {
-  const dict = translations[currentLang];
-  let html = "";
-
-  if (consult.summary) {
-    html += `<h3>${dict.consultation_summary}</h3>`;
-    html += `<p>${escapeHtml(consult.summary)}</p>`;
-  }
-  if (consult.meal_plan && consult.meal_plan.length) {
-    html += `<h3>${dict.consultation_meal_plan}</h3>`;
-    html += `<ul>`;
-    consult.meal_plan.forEach(meal => {
-      html += `<li><strong>${escapeHtml(meal.meal)}:</strong> ${escapeHtml(meal.name)} — <em>${escapeHtml(meal.items.join(", "))}</em></li>`;
+    html += `</ul>`;
+    
+    html += `<h3>🧩 Deficient Nutrients:</h3><ul>`;
+    for (const [k, v] of Object.entries(data.deficient)) {
+      html += `<li><strong>${k}:</strong> need ${v} more</li>`;
+    }
+    html += `</ul>`;
+    
+    html += `<h3>🍴 Recommendations:</h3><ul>`;
+    data.recommendations.forEach(item => {
+      html += `<li>${item[0]} — ${item[1]}</li>`;
     });
     html += `</ul>`;
+    
+    outEl.innerHTML = html;
+    
+    // Enable chat with analysis data
+    addChatMessage("I can see your nutrition analysis! Ask me anything about your deficiencies.", 'ai');
+    
+  } catch (err) {
+    outEl.innerHTML = `<p style="color:red;">❌ ${err.message}</p>`;
   }
-  if (consult.advice) {
-    html += `<h3>${dict.consultation_advice}</h3>`;
-    html += `<p>${escapeHtml(consult.advice)}</p>`;
-  }
-
-  document.getElementById("consult-output").innerHTML = html;
 }
 
-/* wiring */
+// Wire up buttons
 document.getElementById("addBtn").addEventListener("click", addFood);
 document.getElementById("analyzeBtn").addEventListener("click", analyze);
-document.getElementById("consultBtn").addEventListener("click", consultAI);
 
-
-// --- CHATBOT SCRIPT ---
-const chatWidget = document.getElementById("chat-widget");
-const chatHeader = document.getElementById("chat-header");
-const chatToggleBtn = document.getElementById("chat-toggle-btn");
-const chatMessages = document.getElementById("chat-messages");
-const chatInput = document.getElementById("chat-input");
-const chatSendBtn = document.getElementById("chat-send-btn");
-const suggestionBtns = document.querySelectorAll(".suggestion-btn");
-
-// Hide chat widget initially
-chatWidget.style.display = "none";
-
-// Toggle minimize/maximize
-chatToggleBtn.addEventListener("click", () => {
-  chatWidget.classList.toggle("minimized");
-  chatToggleBtn.textContent = chatWidget.classList.contains("minimized") ? "+" : "-";
-});
-
-// Function to add a message to the chat window
-function addMessage(sender, text) {
-  const messageEl = document.createElement("div");
-  messageEl.classList.add("message", sender);
-  messageEl.textContent = text;
-  chatMessages.appendChild(messageEl);
-  chatMessages.scrollTop = chatMessages.scrollHeight; // Auto-scroll
-}
-
-// Function to handle sending a message
-async function sendMessage() {
-  const messageText = chatInput.value.trim();
-  if (!messageText) return;
-
-  addMessage("user", messageText);
-  chatInput.value = "";
-
-  const typingIndicator = document.createElement("div");
-  typingIndicator.classList.add("message", "bot");
-  typingIndicator.textContent = "...";
-  chatMessages.appendChild(typingIndicator);
-  chatMessages.scrollTop = chatMessages.scrollHeight;
-
-  if (!currentAnalysisData) {
-    typingIndicator.textContent = "Please run a nutrition analysis first to get personalized advice.";
-    return;
-  }
-
-  const payload = {
-    message: messageText,
-    analysis_data: currentAnalysisData,
-    lang: currentLang
-  };
-
-  try {
-    const res = await fetch("/chat", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload)
-    });
-    const data = await res.json();
-
-    typingIndicator.remove();
-
-    if (data.ok) {
-      addMessage("bot", data.reply);
-    } else {
-      addMessage("bot", `Error: ${data.error || 'Something went wrong.'}`);
-    }
-  } catch (err) {
-    typingIndicator.remove();
-    addMessage("bot", `Error: ${err.message || 'Could not connect to the server.'}`);
-  }
-}
-
-// Event Listeners
-chatSendBtn.addEventListener("click", sendMessage);
-chatInput.addEventListener("keydown", (e) => {
-  if (e.key === "Enter") {
-    e.preventDefault();
-    sendMessage();
-  }
-});
-
-suggestionBtns.forEach(btn => {
-  btn.addEventListener("click", () => {
-    chatInput.value = btn.textContent;
-    sendMessage();
-  });
-});
-// --- END CHATBOT SCRIPT ---
-
-
-/* keep language across reloads */
-applyTranslations();
+console.log('�� NutriGuard AI loaded successfully!');
 </script>
-<!-- Chatbot container -->
-  <div id="chat-widget" class="chat-widget">
-    <div id="chat-header" class="chat-header">
-      <span id="chat-title">AI Dietician Assistant</span>
-      <button id="chat-toggle-btn">-</button>
-    </div>
-    <div id="chat-body" class="chat-body">
-      <div id="chat-messages" class="chat-messages"></div>
-      <div id="chat-suggestions" class="chat-suggestions">
-        <button class="suggestion-btn">What should I eat for breakfast?</button>
-        <button class="suggestion-btn">Suggest a meal plan</button>
-        <button class="suggestion-btn">How to improve my protein intake?</button>
-        <button class="suggestion-btn">Vegetarian options for my deficiencies</button>
-      </div>
-      <div id="chat-input-container" class="chat-input-container">
-        <input type="text" id="chat-input" placeholder="Type your message..." />
-        <button id="chat-send-btn">Send</button>
-      </div>
-    </div>
-  </div>
+
 </body>
 </html>
