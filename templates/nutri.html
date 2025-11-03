@@ -50,6 +50,7 @@
       <div class="controls">
         <button id="addBtn">➕ Add Another Food</button>
         <button id="analyzeBtn">Analyze 🍽️</button>
+        <button id="consultBtn" style="display: none;">Consult with AI 🤖</button>
       </div>
     </div>
 
@@ -78,11 +79,15 @@ const translations = {
     qtyTip: "Tip: Qty is interpreted as <strong>grams</strong> (e.g. 200 for 200g).",
     addFood: "➕ Add Another Food",
     analyze: "Analyze 🍽️",
+    consult_ai: "Consult with AI 🤖",
     weatherHeading: (city) => `✅ Weather in ${city}`,
     totalNutrients: "📊 Total Nutrients:",
     deficient: "🧩 Deficient Nutrients:",
     allBalanced: "🎉 All nutrients balanced!",
     recommendations: "🍴 Recommended Foods & Nutrients:",
+    consultation_summary: "📝 AI Summary:",
+    consultation_meal_plan: "🥗 AI Meal Plan:",
+    consultation_advice: "💡 AI General Advice:",
     errorPrefix: "❌",
     need_more: (nutrient, value) => `${nutrient}: need ${value} more`,
     nutrients: {
@@ -121,11 +126,15 @@ const translations = {
     qtyTip: "सूचना: मात्रा ग्राम में है (उदा., 200 = 200g)।",
     addFood: "➕ और एक जोड़ें",
     analyze: "विश्लेषण करें 🍽️",
+    consult_ai: "AI से सलाह लें 🤖",
     weatherHeading: (city) => `✅ मौसम — ${city}`,
     totalNutrients: "📊 कुल पोषक तत्व:",
     deficient: "🧩 कम पोषक तत्व:",
     allBalanced: "🎉 सभी पोषक तत्व संतुलित हैं!",
     recommendations: "🍴 सुझाए गए खाद्य पदार्थ और पोषक तत्व:",
+    consultation_summary: "📝 AI सारांश:",
+    consultation_meal_plan: "🥗 AI भोजन योजना:",
+    consultation_advice: "💡 AI सामान्य सलाह:",
     errorPrefix: "❌",
     need_more: (nutrient, value) => `${nutrient}: आवश्यकता ${value} अधिक`,
     nutrients: {
@@ -164,11 +173,15 @@ const translations = {
     qtyTip: "గమనిక: పరిమాణం గ్రాముల్లో (ఉదా., 200 = 200g).",
     addFood: "➕ మరొకటి జోడించండి",
     analyze: "విశ్లేషించు 🍽️",
+    consult_ai: "AI ని సంప్రదించండి 🤖",
     weatherHeading: (city) => `✅ వాతావరణం — ${city}`,
     totalNutrients: "📊 మొత్తం పోషకాలు:",
     deficient: "🧩 లోపాలు ఉన్న పోషకాలు:",
     allBalanced: "🎉 అన్ని పోషకాలు సమతుల్యంగా ఉన్నవి!",
     recommendations: "🍴 సూచించిన ఆహారాలు & పోషకాలు:",
+    consultation_summary: "📝 AI సారాంశం:",
+    consultation_meal_plan: "🥗 AI భోజన ప్రణాళిక:",
+    consultation_advice: "💡 AI సాధారణ సలహా:",
     errorPrefix: "❌",
     need_more: (nutrient, value) => `${nutrient}: అవసరం ${value} ఎక్కువ`,
     nutrients: {
@@ -201,6 +214,7 @@ const translations = {
 /* Persisted language in localStorage */
 const LS_KEY = "nutri_lang";
 let currentLang = localStorage.getItem(LS_KEY) || "en";
+let currentAnalysisData = null;
 
 /* Helpers to get translations easily */
 function t(key) {
@@ -256,6 +270,7 @@ function applyTranslations() {
   document.getElementById("qtyTip").innerHTML = dict.qtyTip;
   document.getElementById("addBtn").textContent = dict.addFood;
   document.getElementById("analyzeBtn").textContent = dict.analyze;
+  document.getElementById("consultBtn").textContent = dict.consult_ai;
   applyLangToPicker();
 }
 
@@ -377,17 +392,83 @@ async function analyze() {
     const data = await res.json();
     if (data.error) {
       outEl.innerHTML = `<p style="color:red;">${escapeHtml(translations[currentLang].errorPrefix)} ${escapeHtml(data.error)}</p>`;
+      currentAnalysisData = null;
+      document.getElementById("consultBtn").style.display = "none";
       return;
     }
     renderOutput(data, city);
+    currentAnalysisData = data;
+    document.getElementById("consultBtn").style.display = "inline-block";
   } catch (err) {
     outEl.innerHTML = `<p style="color:red;">${escapeHtml(translations[currentLang].errorPrefix)} ${escapeHtml(err.message || String(err))}</p>`;
+    currentAnalysisData = null;
+    document.getElementById("consultBtn").style.display = "none";
   }
+}
+
+async function consultAI() {
+  if (!currentAnalysisData) return;
+
+  const outEl = document.getElementById("output");
+  const consultBtn = document.getElementById("consultBtn");
+  consultBtn.disabled = true;
+  outEl.innerHTML += `<div id="consult-output"><p>🤖 ...</p></div>`;
+
+  const payload = {
+    ...currentAnalysisData,
+    lang: currentLang,
+    height: document.getElementById("height").value,
+    weight: document.getElementById("weight").value,
+    gender: document.getElementById("gender").value,
+  };
+
+  try {
+    const res = await fetch("/consult", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload)
+    });
+    const data = await res.json();
+    if (!data.ok) {
+      document.getElementById("consult-output").innerHTML = `<p style="color:red;">${escapeHtml(translations[currentLang].errorPrefix)} ${escapeHtml(data.error)}</p>`;
+      return;
+    }
+    renderConsultation(data.consult);
+  } catch (err) {
+    document.getElementById("consult-output").innerHTML = `<p style="color:red;">${escapeHtml(translations[currentLang].errorPrefix)} ${escapeHtml(err.message || String(err))}</p>`;
+  } finally {
+    consultBtn.disabled = false;
+  }
+}
+
+function renderConsultation(consult) {
+  const dict = translations[currentLang];
+  let html = "";
+
+  if (consult.summary) {
+    html += `<h3>${dict.consultation_summary}</h3>`;
+    html += `<p>${escapeHtml(consult.summary)}</p>`;
+  }
+  if (consult.meal_plan && consult.meal_plan.length) {
+    html += `<h3>${dict.consultation_meal_plan}</h3>`;
+    html += `<ul>`;
+    consult.meal_plan.forEach(meal => {
+      html += `<li><strong>${escapeHtml(meal.meal)}:</strong> ${escapeHtml(meal.name)} — <em>${escapeHtml(meal.items.join(", "))}</em></li>`;
+    });
+    html += `</ul>`;
+  }
+  if (consult.advice) {
+    html += `<h3>${dict.consultation_advice}</h3>`;
+    html += `<p>${escapeHtml(consult.advice)}</p>`;
+  }
+
+  document.getElementById("consult-output").innerHTML = html;
 }
 
 /* wiring */
 document.getElementById("addBtn").addEventListener("click", addFood);
 document.getElementById("analyzeBtn").addEventListener("click", analyze);
+document.getElementById("consultBtn").addEventListener("click", consultAI);
 
 /* keep language across reloads */
 applyTranslations();
