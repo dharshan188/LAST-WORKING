@@ -1,8 +1,8 @@
-# app.py - Complete NutriGuard AI with Groq API + Smart Grocery List
+# app.py - Complete NutriGuard AI with Groq API + Smart Grocery List + Multi-Timeline Progress Prediction
 import os
 import re
 import json
-from typing import Dict, Any
+from typing import Dict, Any, List
 from flask import Flask, render_template, request, jsonify
 import requests
 import traceback
@@ -153,6 +153,154 @@ def recommend_foods(defic: Dict[str,str], weather: Dict[str,Any]):
         rec.append((f, "-", "-"))
     return rec[:10]
 
+# ----------------- MULTI-TIMELINE PROGRESS PREDICTION -----------------
+def calculate_daily_calories(food_items: List[Dict]) -> float:
+    """Estimate daily calories from food items"""
+    total_calories = 0
+    for item in food_items:
+        qty = float(item.get('qty', 100))
+        # Rough estimate: 1.5 calories per gram on average
+        total_calories += qty * 1.5
+    return total_calories
+
+def predict_multi_timeline_health(profile: Dict, food_items: List[Dict]) -> Dict:
+    """
+    Predict health metrics over multiple timelines: 1 week, 1 month, 3 months
+    """
+    try:
+        # Extract profile data
+        current_weight = float(profile.get('weight', 70))
+        height_cm = float(profile.get('height', 175))
+        age = int(profile.get('age', 30))
+        gender = profile.get('gender', 'Male')
+        goal = profile.get('goal', 'Weight Maintenance')
+        
+        current_bp_sys = int(profile.get('systolicBP', 120))
+        current_bp_dia = int(profile.get('diastolicBP', 80))
+        current_sugar = int(profile.get('bloodSugar', 90))
+        current_chol = int(profile.get('cholesterol', 180))
+        
+        # Calculate BMR (Basal Metabolic Rate)
+        if gender.lower() == 'male':
+            bmr = 10 * current_weight + 6.25 * height_cm - 5 * age + 5
+        else:
+            bmr = 10 * current_weight + 6.25 * height_cm - 5 * age - 161
+        
+        # Estimate TDEE (Total Daily Energy Expenditure) - moderate activity
+        tdee = bmr * 1.55
+        
+        # Calculate daily calories from food
+        daily_calories = calculate_daily_calories(food_items)
+        
+        # Calculate calorie deficit/surplus
+        calorie_diff = daily_calories - tdee
+        
+        # Estimate total carbs for blood sugar prediction
+        total_carbs = sum(float(item.get('qty', 100)) * 0.3 for item in food_items)
+        
+        # Timeline predictions
+        timelines = []
+        
+        for period_name, days in [("1 Week", 7), ("1 Month", 30), ("3 Months", 90)]:
+            # Weight prediction (7700 calories = 1 kg)
+            weight_change_kg = (calorie_diff * days) / 7700
+            predicted_weight = round(current_weight + weight_change_kg, 1)
+            
+            # Blood Sugar prediction
+            sugar_change = 0
+            if total_carbs > 300:  # High carb diet
+                sugar_change = (5 + (total_carbs - 300) * 0.02) * (days / 30)
+            elif total_carbs < 150:  # Low carb diet
+                sugar_change = -(150 - total_carbs) * 0.03 * (days / 30)
+            predicted_sugar = round(current_sugar + sugar_change, 1)
+            
+            # Blood Pressure prediction (based on weight change)
+            bp_sys_change = 0
+            bp_dia_change = 0
+            if weight_change_kg < -2:  # Weight loss helps BP
+                bp_sys_change = -3 * (days / 30)
+                bp_dia_change = -2 * (days / 30)
+            elif weight_change_kg > 2:  # Weight gain may increase BP
+                bp_sys_change = 3 * (days / 30)
+                bp_dia_change = 2 * (days / 30)
+            predicted_bp_sys = round(current_bp_sys + bp_sys_change)
+            predicted_bp_dia = round(current_bp_dia + bp_dia_change)
+            
+            # Cholesterol prediction
+            chol_change = 0
+            if weight_change_kg < -2:
+                chol_change = -8 * (days / 30)
+            elif weight_change_kg > 2:
+                chol_change = 5 * (days / 30)
+            predicted_chol = round(current_chol + chol_change)
+            
+            timelines.append({
+                "period": period_name,
+                "days": days,
+                "weight": {
+                    "current": current_weight,
+                    "predicted": predicted_weight,
+                    "change": round(weight_change_kg, 2),
+                    "status": "success" if abs(weight_change_kg) < 2 else ("warning" if abs(weight_change_kg) < 4 else "danger")
+                },
+                "blood_sugar": {
+                    "current": current_sugar,
+                    "predicted": predicted_sugar,
+                    "change": round(sugar_change, 2),
+                    "status": "success" if abs(sugar_change) < 5 else ("warning" if abs(sugar_change) < 10 else "danger")
+                },
+                "blood_pressure": {
+                    "current": f"{current_bp_sys}/{current_bp_dia}",
+                    "predicted": f"{predicted_bp_sys}/{predicted_bp_dia}",
+                    "change_sys": round(bp_sys_change, 1),
+                    "change_dia": round(bp_dia_change, 1),
+                    "status": "success" if abs(bp_sys_change) < 3 else ("warning" if abs(bp_sys_change) < 6 else "danger")
+                },
+                "cholesterol": {
+                    "current": current_chol,
+                    "predicted": predicted_chol,
+                    "change": round(chol_change, 2),
+                    "status": "success" if abs(chol_change) < 5 else ("warning" if abs(chol_change) < 10 else "danger")
+                }
+            })
+        
+        # Overall recommendation
+        monthly_weight_change = timelines[1]["weight"]["change"]  # Get 1-month prediction
+        
+        if goal == "Weight Loss":
+            if monthly_weight_change < -1:
+                overall = "Excellent! Your diet is aligned with your weight loss goal. Continue this pattern for best results. Stay hydrated and maintain regular physical activity."
+            else:
+                overall = "Your current diet may not support weight loss effectively. Consider reducing portions, increasing vegetables, or boosting physical activity."
+        elif goal == "Weight Gain":
+            if monthly_weight_change > 1:
+                overall = "Great progress! Your diet supports healthy weight gain. Focus on nutrient-dense foods like nuts, lean proteins, and whole grains."
+            else:
+                overall = "You may need to increase calorie intake to meet your weight gain goals. Add healthy fats, protein shakes, and frequent meals."
+        else:  # Maintenance
+            if abs(monthly_weight_change) < 1:
+                overall = "Perfect balance! Your diet maintains your current weight well. Keep up the good work with this balanced approach."
+            else:
+                overall = "Your diet may lead to weight changes. Adjust portions and macronutrients to maintain your current weight."
+        
+        return {
+            "success": True,
+            "daily_calories": round(daily_calories, 1),
+            "tdee": round(tdee, 1),
+            "calorie_diff": round(calorie_diff, 1),
+            "goal": goal,
+            "timelines": timelines,
+            "overall_message": overall
+        }
+        
+    except Exception as e:
+        print(f"❌ Error in predict_multi_timeline_health: {e}")
+        traceback.print_exc()
+        return {
+            "success": False,
+            "error": f"Prediction calculation error: {str(e)}"
+        }
+
 # ----------------- GROQ AI CHAT -----------------
 def call_groq_chat(message: str, analysis: Dict[str, Any], lang: str = "en") -> str:
     """
@@ -248,10 +396,6 @@ def call_groq_chat(message: str, analysis: Dict[str, Any], lang: str = "en") -> 
 @app.route("/")
 def home():
     return render_template("nutri.html")
-
-@app.route("/smart_gross_list")
-def smart_gross_list():
-    return render_template("smart_gross_list.html")
 
 @app.route("/analyze", methods=["POST"])
 def analyze():
@@ -363,6 +507,41 @@ def chat():
         print(traceback.format_exc())
         return jsonify({"ok": False, "error": str(e)}), 500
 
+@app.route("/api/predict_progress", methods=["POST"])
+def predict_progress():
+    """
+    Predict health metrics progress over multiple timelines (1 week, 1 month, 3 months)
+    """
+    print("\n" + "="*60)
+    print("📈 /API/PREDICT_PROGRESS ENDPOINT HIT")
+    print("="*60)
+    
+    try:
+        data = request.get_json() or {}
+        profile = data.get('profile', {})
+        food_items = data.get('food_items', [])
+        
+        print(f"📦 Profile: {profile.get('name', 'Unknown')}")
+        print(f"🍽️ Food items: {len(food_items)} items")
+        
+        if not profile or not food_items:
+            return jsonify({"success": False, "error": "Profile and food items required"}), 400
+        
+        predictions = predict_multi_timeline_health(profile, food_items)
+        
+        if not predictions.get("success"):
+            return jsonify(predictions), 500
+        
+        print(f"✅ Predictions generated successfully")
+        return jsonify(predictions)
+        
+    except Exception as e:
+        print("="*60)
+        print("❌ EXCEPTION IN /API/PREDICT_PROGRESS")
+        print("="*60)
+        print(traceback.format_exc())
+        return jsonify({"success": False, "error": str(e)}), 500
+
 @app.route("/api/generate_grocery_list", methods=["POST"])
 def generate_grocery_list():
     """
@@ -386,29 +565,22 @@ def generate_grocery_list():
         prompt = f"""Generate a personalized grocery list based on this health profile:
 
 **Personal Information:**
+- Name: {data.get('name')}
 - Age: {data.get('age')} years
 - Gender: {data.get('gender')}
 - Height: {data.get('height')} cm
 - Weight: {data.get('weight')} kg
-- Activity Level: {data.get('activityLevel')}
+- Health Goal: {data.get('goal')}
 
 **Health Metrics:**
 - Blood Pressure: {data.get('systolicBP')}/{data.get('diastolicBP')} mmHg
 - Blood Sugar: {data.get('bloodSugar')} mg/dL
 - Cholesterol: {data.get('cholesterol')} mg/dL
 
-**Dietary Preferences:**
-- Goals: {data.get('dietaryGoals')}
-- Restrictions: {data.get('dietaryRestrictions', 'None')}
-- Preferred Cuisines: {data.get('preferredCuisines', 'Any')}
-- Budget Level: {data.get('budgetLevel')}
-- Meal Plan Duration: {data.get('mealPlanDuration')} days
+**Location:**
+- City: {data.get('city')}
 
-**Location Context:**
-- Region: {data.get('region')}
-- Weather: {data.get('weather')}
-
-Please generate a comprehensive grocery list organized by categories.
+Please generate a comprehensive grocery list organized by categories for a week.
 
 Return ONLY a valid JSON array with this exact format (no markdown, no explanations):
 [
@@ -421,11 +593,8 @@ Return ONLY a valid JSON array with this exact format (no markdown, no explanati
 ]
 
 Make the list:
-- Tailored to their health conditions (BP, sugar, cholesterol)
-- Appropriate for their dietary goals and restrictions
-- Suitable for their region ({data.get('region')}) and weather ({data.get('weather')})
-- Within their budget level ({data.get('budgetLevel')})
-- Sufficient for {data.get('mealPlanDuration')} days
+- Tailored to their health goal: {data.get('goal')}
+- Appropriate for their health conditions
 - Include 15-25 items with variety and balanced nutrition"""
 
         print("🚀 Calling Groq API...")
@@ -493,11 +662,18 @@ Make the list:
             fallback_list = [
                 {"category": "Fruits & Vegetables", "name": "Spinach", "quantity": "500g"},
                 {"category": "Fruits & Vegetables", "name": "Tomatoes", "quantity": "1kg"},
+                {"category": "Fruits & Vegetables", "name": "Bananas", "quantity": "6 pieces"},
                 {"category": "Proteins", "name": "Chicken Breast", "quantity": "1kg"},
                 {"category": "Proteins", "name": "Eggs", "quantity": "12 pieces"},
+                {"category": "Proteins", "name": "Lentils", "quantity": "500g"},
                 {"category": "Grains & Cereals", "name": "Brown Rice", "quantity": "2kg"},
+                {"category": "Grains & Cereals", "name": "Whole Wheat Bread", "quantity": "2 loaves"},
                 {"category": "Dairy & Alternatives", "name": "Low-fat Milk", "quantity": "2L"},
+                {"category": "Dairy & Alternatives", "name": "Greek Yogurt", "quantity": "500g"},
                 {"category": "Snacks & Beverages", "name": "Green Tea", "quantity": "100g"},
+                {"category": "Snacks & Beverages", "name": "Almonds", "quantity": "200g"},
+                {"category": "Spices & Condiments", "name": "Olive Oil", "quantity": "500ml"},
+                {"category": "Spices & Condiments", "name": "Turmeric", "quantity": "50g"},
             ]
             return jsonify({"grocery_list": fallback_list, "note": "Using fallback list due to AI response format issue"})
         
@@ -516,6 +692,6 @@ Make the list:
 
 if __name__ == "__main__":
     print("\n" + "="*60)
-    print("🚀 Starting NutriGuard AI Server with Groq")
+    print("🚀 Starting NutriGuard AI Server with Multi-Timeline Progress Prediction")
     print("="*60)
     app.run(host="0.0.0.0", port=int(os.getenv("PORT", "5000")), debug=True)
