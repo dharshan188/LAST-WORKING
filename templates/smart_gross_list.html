@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Grocery List</title>
+    <link rel="stylesheet" href="/static/style.css">
+    <link rel="stylesheet" href="/static/smart_gross_list.css">
+</head>
+<body>
+    <div class="container">
+        <div class="text-center mb-10">
+            <h1 class="title">OptiGrocery Planner</h1>
+            <p class="subtitle">Your personalized, health-optimized grocery list generator.</p>
+        </div>
+
+        <div class="main-grid">
+            <div class="form-column">
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">Create Your Health Profile</h2>
+                        <p class="card-description">Provide your details to get a personalized grocery list.</p>
+                    </div>
+                    <div class="card-content">
+                        <form id="health-profile-form">
+                            <!-- Personal Info -->
+                            <fieldset>
+                                <legend>Personal Info</legend>
+                                <div class="grid-col-2">
+                                    <div><label for="age">Age</label><input id="age" type="number" value="30" required></div>
+                                    <div><label for="gender">Gender</label><select id="gender"><option>Male</option><option>Female</option><option>Other</option></select></div>
+                                    <div><label for="height">Height (cm)</label><input id="height" type="number" value="175" required></div>
+                                    <div><label for="weight">Weight (kg)</label><input id="weight" type="number" value="70" required></div>
+                                </div>
+                            </fieldset>
+
+                            <!-- Health Metrics -->
+                            <fieldset>
+                                <legend>Health Metrics</legend>
+                                <div class="grid-col-2">
+                                    <div><label for="systolicBP">Systolic BP</label><input id="systolicBP" type="number" value="120"></div>
+                                    <div><label for="diastolicBP">Diastolic BP</label><input id="diastolicBP" type="number" value="80"></div>
+                                    <div><label for="bloodSugar">Blood Sugar</label><input id="bloodSugar" type="number" value="90"></div>
+                                    <div><label for="cholesterol">Cholesterol</label><input id="cholesterol" type="number" value="180"></div>
+                                </div>
+                            </fieldset>
+
+                            <!-- Preferences & Planning -->
+                            <fieldset>
+                                <legend>Preferences & Planning</legend>
+                                <div class="grid-col-2">
+                                <div><label for="activityLevel">Activity Level</label><select id="activityLevel"><option>Sedentary</option><option>Lightly Active</option><option selected>Moderately Active</option><option>Very Active</option></select></div>
+                                    <div><label for="dietaryGoals">Dietary Goals</label><input id="dietaryGoals" value="Weight Management"></div>
+                                    <div class="col-span-2"><label for="dietaryRestrictions">Dietary Restrictions</label><input id="dietaryRestrictions" value="None" placeholder="e.g., Gluten-Free"></div>
+                                    <div class="col-span-2"><label for="preferredCuisines">Preferred Cuisines</label><input id="preferredCuisines" value="Mediterranean" placeholder="e.g., Indian, Italian"></div>
+                                    <div><label for="budgetLevel">Budget Level</label><select id="budgetLevel"><option>Low</option><option selected>Medium</option><option>High</option></select></div>
+                                    <div><label for="mealPlanDuration">Duration</label><select id="mealPlanDuration"><option selected>Weekly</option><option>Monthly</option></select></div>
+                                </div>
+                            </fieldset>
+
+                            <!-- Contextual Factors -->
+                            <fieldset>
+                                <legend>Contextual Factors</legend>
+                                <div class="grid-col-2">
+                                    <div><label for="region">Region/Culture</label><input id="region" value="USA"></div>
+                                    <div><label for="weather">Current Weather</label><input id="weather" value="Mild"></div>
+                                </div>
+                            </fieldset>
+
+                            <button type="submit" id="generateBtn">Generate My List</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            <div class="results-column" id="results-section">
+                <!-- Results will be loaded here -->
+                <div class="card placeholder-card">
+                    <div class="card-header"><h2 class="card-title">Ready to Shop Smart?</h2></div>
+                    <div class="card-content">
+                        <p>Fill out your profile on the left to get started.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="/static/smart_gross_list.js"></script>
+</body>
+</html>
