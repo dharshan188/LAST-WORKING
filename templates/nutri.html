@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>NutriGuard AI</title>
+  <title>NutriGuard AI - Fitness Integrated</title>
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
   <style>
@@ -14,6 +14,7 @@
       --success: #28a745;
       --warning: #ffc107;
       --danger: #dc3545;
+      --fitness: #ea4335;
     }
 
     * { box-sizing: border-box; }
@@ -23,7 +24,7 @@
       margin: 0;
       background: linear-gradient(180deg, var(--bg-1) 0%, #ffffff 100%);
       padding: 10px;
-      padding-right: 360px; /* Space for chat widget */
+      padding-right: 360px;
       color: #333;
     }
 
@@ -48,6 +49,166 @@
       font-size: 1.1rem;
       color: #666;
       margin: 0;
+    }
+
+    /* Language Selector */
+    .language-selector {
+      position: fixed;
+      top: 20px;
+      right: 380px;
+      z-index: 1001;
+      background: white;
+      border-radius: 25px;
+      padding: 5px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+      display: flex;
+      gap: 5px;
+    }
+
+    .lang-btn {
+      background: transparent;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 20px;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 0.9rem;
+      transition: all 0.2s;
+      color: #666;
+    }
+
+    .lang-btn:hover {
+      background: #f0f0f0;
+    }
+
+    .lang-btn.active {
+      background: var(--primary);
+      color: white;
+    }
+
+    .fitness-banner {
+      background: linear-gradient(135deg, #ea4335 0%, #fbbc04 100%);
+      color: white;
+      padding: 15px 20px;
+      border-radius: 12px;
+      margin-bottom: 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 4px 15px rgba(234, 67, 53, 0.3);
+    }
+
+    .fitness-banner.connected {
+      background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+    }
+
+    .fitness-banner-content {
+      flex: 1;
+    }
+
+    .fitness-banner h3 {
+      margin: 0 0 5px 0;
+      font-size: 1.2rem;
+    }
+
+    .fitness-banner p {
+      margin: 0;
+      font-size: 0.9rem;
+      opacity: 0.9;
+    }
+
+    .fitness-connect-btn {
+      background: white;
+      color: #ea4335;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 25px;
+      cursor: pointer;
+      font-weight: 700;
+      font-size: 0.95rem;
+      transition: transform 0.2s;
+    }
+
+    .fitness-connect-btn:hover {
+      transform: scale(1.05);
+    }
+
+    .fitness-connect-btn.connected {
+      color: #28a745;
+    }
+
+    .fitness-stats {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 20px;
+      color: white;
+      display: none;
+    }
+
+    .fitness-stats.visible {
+      display: block;
+    }
+
+    .fitness-stats h3 {
+      margin: 0 0 15px 0;
+      font-size: 1.3rem;
+    }
+
+    .fitness-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+      gap: 15px;
+    }
+
+    .fitness-metric {
+      background: rgba(255, 255, 255, 0.15);
+      padding: 15px;
+      border-radius: 10px;
+      text-align: center;
+      backdrop-filter: blur(10px);
+    }
+
+    .fitness-metric-icon {
+      font-size: 2rem;
+      margin-bottom: 5px;
+    }
+
+    .fitness-metric-value {
+      font-size: 1.8rem;
+      font-weight: 700;
+      margin: 5px 0;
+    }
+
+    .fitness-metric-label {
+      font-size: 0.85rem;
+      opacity: 0.9;
+    }
+
+    .activity-badge {
+      display: inline-block;
+      padding: 8px 16px;
+      border-radius: 20px;
+      font-weight: 600;
+      font-size: 0.9rem;
+      margin-top: 10px;
+    }
+
+    .activity-badge.sedentary {
+      background: #dc3545;
+    }
+
+    .activity-badge.light {
+      background: #ffc107;
+      color: #333;
+    }
+
+    .activity-badge.moderate {
+      background: #17a2b8;
+    }
+
+    .activity-badge.high {
+      background: #28a745;
     }
 
     .card {
@@ -222,7 +383,34 @@
       box-shadow: 0 2px 5px rgba(0,0,0,0.05);
     }
 
-    /* Progress Prediction Styles */
+    .adjusted-nutrition {
+      background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+      color: white;
+      border-radius: 12px;
+      padding: 20px;
+      margin-top: 20px;
+    }
+
+    .adjusted-nutrition h3 {
+      color: white;
+      margin-top: 0;
+    }
+
+    .nutrition-recommendations {
+      background: rgba(255, 255, 255, 0.2);
+      padding: 15px;
+      border-radius: 8px;
+      margin-top: 15px;
+    }
+
+    .nutrition-recommendations li {
+      background: rgba(255, 255, 255, 0.3);
+      padding: 10px;
+      margin: 8px 0;
+      border-radius: 6px;
+      list-style: none;
+    }
+
     .progress-results {
       background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
       border-radius: 12px;
@@ -450,7 +638,6 @@
       color: #333;
     }
 
-    /* Loading Spinner */
     .loading-spinner {
       border: 4px solid #f3f3f3;
       border-top: 4px solid var(--accent);
@@ -466,7 +653,6 @@
       100% { transform: rotate(360deg); }
     }
 
-    /* Chat Widget */
     .chat-widget {
       position: fixed;
       right: 10px;
@@ -617,6 +803,11 @@
         padding-right: 0;
       }
 
+      .language-selector {
+        right: 10px;
+        top: 10px;
+      }
+
       .form-grid {
         grid-template-columns: 1fr;
       }
@@ -641,109 +832,138 @@
         grid-template-columns: 1fr;
       }
 
+      .fitness-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
       .chat-widget {
         width: calc(100% - 20px);
         right: 10px;
         bottom: 10px;
       }
     }
-
-    @media (min-width: 769px) and (max-width: 1400px) {
-      body {
-        padding: 10px;
-        padding-right: 360px;
-      }
-
-      .container {
-        max-width: 100%;
-      }
-    }
-
-    @media (min-width: 1401px) {
-      body {
-        padding: 20px;
-        padding-right: 380px;
-      }
-
-      .container {
-        max-width: 1200px;
-        margin: 0 auto;
-      }
-    }
   </style>
 </head>
 <body>
 
+  <!-- Language Selector -->
+  <div class="language-selector">
+    <button class="lang-btn active" onclick="changeLanguage('en')">English</button>
+    <button class="lang-btn" onclick="changeLanguage('hi')">हिंदी</button>
+    <button class="lang-btn" onclick="changeLanguage('te')">తెలుగు</button>
+  </div>
+
   <div class="container">
     <div class="header">
-      <h1>🥗 NutriGuard AI</h1>
-      <p>Smart Nutrition, Grocery Planning & Health Progress Tracking</p>
+      <h1 data-i18n="app_title">🥗 NutriGuard AI</h1>
+      <p data-i18n="app_subtitle">Smart Nutrition, Fitness Tracking & Health Progress</p>
+    </div>
+
+    <!-- Fitness Connection Banner -->
+    <div id="fitness-banner" class="fitness-banner">
+      <div class="fitness-banner-content">
+        <h3 data-i18n="fitness_connect_title">🏃‍♂️ Connect Google Fit</h3>
+        <p data-i18n="fitness_connect_desc">Sync your activity data for personalized nutrition recommendations</p>
+      </div>
+      <button class="fitness-connect-btn" onclick="connectGoogleFit()">
+        <span data-i18n="connect_now">Connect Now</span>
+      </button>
+    </div>
+
+    <!-- Fitness Stats Display -->
+    <div id="fitness-stats" class="fitness-stats">
+      <h3 data-i18n="today_activity">📊 Today's Activity</h3>
+      <div class="fitness-grid">
+        <div class="fitness-metric">
+          <div class="fitness-metric-icon">👟</div>
+          <div class="fitness-metric-value" id="steps-value">0</div>
+          <div class="fitness-metric-label" data-i18n="steps">Steps</div>
+        </div>
+        <div class="fitness-metric">
+          <div class="fitness-metric-icon">🔥</div>
+          <div class="fitness-metric-value" id="calories-value">0</div>
+          <div class="fitness-metric-label" data-i18n="calories_burned">Calories Burned</div>
+        </div>
+        <div class="fitness-metric">
+          <div class="fitness-metric-icon">📏</div>
+          <div class="fitness-metric-value" id="distance-value">0</div>
+          <div class="fitness-metric-label" data-i18n="distance_km">Distance (km)</div>
+        </div>
+        <div class="fitness-metric">
+          <div class="fitness-metric-icon">⏱️</div>
+          <div class="fitness-metric-value" id="active-value">0</div>
+          <div class="fitness-metric-label" data-i18n="active_minutes">Active Minutes</div>
+        </div>
+      </div>
+      <div style="text-align: center;">
+        <span class="activity-badge" id="activity-badge" data-i18n="calculating">Calculating...</span>
+      </div>
     </div>
 
     <!-- Main Profile Form -->
     <div class="card">
-      <h2>👤 Your Health Profile</h2>
+      <h2 data-i18n="health_profile">👤 Your Health Profile</h2>
       
       <fieldset>
-        <legend>Personal Information</legend>
+        <legend data-i18n="personal_info">Personal Information</legend>
         <div class="form-grid">
           <div class="form-group">
-            <label for="name">Full Name *</label>
-            <input type="text" id="name" placeholder="Enter your name" required>
+            <label for="name" data-i18n="full_name">Full Name *</label>
+            <input type="text" id="name" data-i18n-placeholder="enter_name" required>
           </div>
           <div class="form-group">
-            <label for="age">Age *</label>
-            <input type="number" id="age" placeholder="Age" value="30" required>
+            <label for="age" data-i18n="age">Age *</label>
+            <input type="number" id="age" data-i18n-placeholder="age" value="30" required>
           </div>
           <div class="form-group">
-            <label for="gender">Gender *</label>
+            <label for="gender" data-i18n="gender">Gender *</label>
             <select id="gender" required>
-              <option value="Male">Male ♂️</option>
-              <option value="Female">Female ♀️</option>
-              <option value="Other">Other</option>
+              <option value="Male" data-i18n="male">Male ♂️</option>
+              <option value="Female" data-i18n="female">Female ♀️</option>
+              <option value="Other" data-i18n="other">Other</option>
             </select>
           </div>
           <div class="form-group">
-            <label for="height">Height (cm) *</label>
-            <input type="number" id="height" placeholder="e.g., 175" value="175" required>
+            <label for="height" data-i18n="height_cm">Height (cm) *</label>
+            <input type="number" id="height" placeholder="175" value="175" required>
           </div>
           <div class="form-group">
-            <label for="weight">Weight (kg) *</label>
-            <input type="number" id="weight" placeholder="e.g., 70" value="70" required>
+            <label for="weight" data-i18n="weight_kg">Weight (kg) *</label>
+            <input type="number" id="weight" placeholder="70" value="70" required>
           </div>
           <div class="form-group">
-            <label for="city">City *</label>
-            <input type="text" id="city" placeholder="Enter your city" required>
+            <label for="city" data-i18n="city">City *</label>
+            <input type="text" id="city" data-i18n-placeholder="enter_city" required>
           </div>
           <div class="form-group">
-            <label for="goal">Health Goal *</label>
+            <label for="goal" data-i18n="health_goal">Health Goal *</label>
             <select id="goal" required>
-              <option value="Weight Loss">🔥 Weight Loss</option>
-              <option value="Weight Gain">💪 Weight Gain</option>
-              <option value="Weight Maintenance" selected>⚖️ Weight Maintenance</option>
+              <option value="Weight Loss" data-i18n="weight_loss">🔥 Weight Loss</option>
+              <option value="Weight Gain" data-i18n="weight_gain">💪 Weight Gain</option>
+              <option value="Weight Maintenance" data-i18n="weight_maintenance" selected>⚖️ Weight Maintenance</option>
             </select>
           </div>
         </div>
       </fieldset>
 
       <fieldset>
-        <legend>Health Metrics (Optional)</legend>
+        <legend data-i18n="health_metrics">Health Metrics (Optional)</legend>
         <div class="form-grid">
           <div class="form-group">
-            <label for="systolicBP">Systolic BP (mmHg)</label>
-            <input type="number" id="systolicBP" placeholder="e.g., 120" value="120">
+            <label for="systolicBP" data-i18n="systolic_bp">Systolic BP (mmHg)</label>
+            <input type="number" id="systolicBP" placeholder="120" value="120">
           </div>
           <div class="form-group">
-            <label for="diastolicBP">Diastolic BP (mmHg)</label>
-            <input type="number" id="diastolicBP" placeholder="e.g., 80" value="80">
+            <label for="diastolicBP" data-i18n="diastolic_bp">Diastolic BP (mmHg)</label>
+            <input type="number" id="diastolicBP" placeholder="80" value="80">
           </div>
           <div class="form-group">
-            <label for="bloodSugar">Blood Sugar (mg/dL)</label>
-            <input type="number" id="bloodSugar" placeholder="e.g., 90" value="90">
+            <label for="bloodSugar" data-i18n="blood_sugar">Blood Sugar (mg/dL)</label>
+            <input type="number" id="bloodSugar" placeholder="90" value="90">
           </div>
           <div class="form-group">
-            <label for="cholesterol">Cholesterol (mg/dL)</label>
-            <input type="number" id="cholesterol" placeholder="e.g., 180" value="180">
+            <label for="cholesterol" data-i18n="cholesterol">Cholesterol (mg/dL)</label>
+            <input type="number" id="cholesterol" placeholder="180" value="180">
           </div>
         </div>
       </fieldset>
@@ -751,24 +971,25 @@
 
     <!-- Food Analysis Section -->
     <div class="card">
-      <h2>🍽️ Today's Food Analysis</h2>
+      <h2 data-i18n="food_analysis">🍽️ Today's Food Analysis</h2>
       <div class="tip">
-        💡 <strong>Tip:</strong> Quantity is in grams (e.g., 200 for 200g)
+        <span data-i18n="tip_prefix">💡 <strong>Tip:</strong></span>
+        <span data-i18n="tip_text"> Quantity is in grams (e.g., 200 for 200g). Your nutrition will be adjusted based on your activity level!</span>
       </div>
       
       <div class="food-list" id="food-list">
         <div class="food-item">
-          <input type="text" placeholder="Food name (e.g., Rice)" class="food-name">
-          <input type="number" placeholder="Qty (g)" class="food-qty" min="1" value="100">
-          <button onclick="removeFood(this)">Remove</button>
+          <input type="text" data-i18n-placeholder="food_name" class="food-name">
+          <input type="number" data-i18n-placeholder="qty_g" class="food-qty" min="1" value="100">
+          <button onclick="removeFood(this)" data-i18n="remove">Remove</button>
         </div>
       </div>
 
       <div class="btn-group">
-        <button class="btn-add" onclick="addFood()">➕ Add Another Food</button>
-        <button onclick="analyzeNutrition()">🔍 Analyze Nutrition</button>
-        <button class="btn-predict" onclick="predictProgress()">📈 Predict My Progress</button>
-        <button onclick="generateGroceryList()">🛒 Generate Grocery List</button>
+        <button class="btn-add" onclick="addFood()"><span data-i18n="add_food">➕ Add Another Food</span></button>
+        <button onclick="analyzeNutrition()"><span data-i18n="analyze_nutrition">🔍 Analyze Nutrition</span></button>
+        <button class="btn-predict" onclick="predictProgress()"><span data-i18n="predict_progress">📈 Predict My Progress</span></button>
+        <button onclick="generateGroceryList()"><span data-i18n="generate_grocery">🛒 Generate Grocery List</span></button>
       </div>
     </div>
 
@@ -785,56 +1006,563 @@
   <!-- Chat Widget -->
   <div class="chat-widget" id="chat-widget">
     <div class="chat-header" onclick="toggleChat()">
-      <h3>🤖 AI Dietician Assistant</h3>
+      <h3 data-i18n="ai_assistant">🤖 AI Dietician Assistant</h3>
       <button id="chat-toggle">−</button>
     </div>
     <div class="chat-body">
       <div class="chat-messages" id="chat-messages">
-        <div class="message bot">
-          👋 Hello! I'm your AI Dietician. Analyze your nutrition first, then I can give you personalized advice!
+        <div class="message bot" data-i18n="chat_welcome">
+          👋 Hello! I'm your AI Dietician. Connect Google Fit and analyze your nutrition for personalized advice!
         </div>
       </div>
       <div class="chat-suggestions">
-        <button class="suggestion-btn" onclick="sendSuggestion('What should I eat for breakfast?')">🍳 Breakfast</button>
-        <button class="suggestion-btn" onclick="sendSuggestion('Suggest a meal plan')">📋 Meal Plan</button>
-        <button class="suggestion-btn" onclick="sendSuggestion('How to improve protein intake?')">💪 Protein</button>
+        <button class="suggestion-btn" onclick="sendSuggestion('breakfast')" data-i18n="breakfast_btn">🍳 Breakfast</button>
+        <button class="suggestion-btn" onclick="sendSuggestion('meal_plan')" data-i18n="meal_plan_btn">📋 Meal Plan</button>
+        <button class="suggestion-btn" onclick="sendSuggestion('protein')" data-i18n="protein_btn">💪 Protein</button>
       </div>
       <div class="chat-input-container">
-        <input type="text" id="chat-input" placeholder="Ask about nutrition...">
-        <button id="chat-send" onclick="sendChatMessage()">Send</button>
+        <input type="text" id="chat-input" data-i18n-placeholder="chat_placeholder">
+        <button id="chat-send" onclick="sendChatMessage()" data-i18n="send">Send</button>
       </div>
     </div>
   </div>
 
 <script>
+// Translation Data
+const translations = {
+  en: {
+    app_title: "🥗 NutriGuard AI",
+    app_subtitle: "Smart Nutrition, Fitness Tracking & Health Progress",
+    fitness_connect_title: "🏃‍♂️ Connect Google Fit",
+    fitness_connect_desc: "Sync your activity data for personalized nutrition recommendations",
+    connect_now: "Connect Now",
+    today_activity: "📊 Today's Activity",
+    steps: "Steps",
+    calories_burned: "Calories Burned",
+    distance_km: "Distance (km)",
+    active_minutes: "Active Minutes",
+    calculating: "Calculating...",
+    health_profile: "👤 Your Health Profile",
+    personal_info: "Personal Information",
+    full_name: "Full Name *",
+    enter_name: "Enter your name",
+    age: "Age *",
+    gender: "Gender *",
+    male: "Male ♂️",
+    female: "Female ♀️",
+    other: "Other",
+    height_cm: "Height (cm) *",
+    weight_kg: "Weight (kg) *",
+    city: "City *",
+    enter_city: "Enter your city",
+    health_goal: "Health Goal *",
+    weight_loss: "🔥 Weight Loss",
+    weight_gain: "💪 Weight Gain",
+    weight_maintenance: "⚖️ Weight Maintenance",
+    health_metrics: "Health Metrics (Optional)",
+    systolic_bp: "Systolic BP (mmHg)",
+    diastolic_bp: "Diastolic BP (mmHg)",
+    blood_sugar: "Blood Sugar (mg/dL)",
+    cholesterol: "Cholesterol (mg/dL)",
+    food_analysis: "🍽️ Today's Food Analysis",
+    tip_prefix: "💡 <strong>Tip:</strong>",
+    tip_text: " Quantity is in grams (e.g., 200 for 200g). Your nutrition will be adjusted based on your activity level!",
+    food_name: "Food name (e.g., Rice)",
+    qty_g: "Qty (g)",
+    remove: "Remove",
+    add_food: "➕ Add Another Food",
+    analyze_nutrition: "🔍 Analyze Nutrition",
+    predict_progress: "📈 Predict My Progress",
+    generate_grocery: "🛒 Generate Grocery List",
+    ai_assistant: "🤖 AI Dietician Assistant",
+    chat_welcome: "👋 Hello! I'm your AI Dietician. Connect Google Fit and analyze your nutrition for personalized advice!",
+    breakfast_btn: "🍳 Breakfast",
+    meal_plan_btn: "📋 Meal Plan",
+    protein_btn: "💪 Protein",
+    chat_placeholder: "Ask about nutrition...",
+    send: "Send",
+    // Activity levels
+    sedentary: "😴 Sedentary",
+    lightly_active: "🚶 Lightly Active",
+    moderately_active: "🏃 Moderately Active",
+    very_active: "💪 Very Active",
+    // Analysis results
+    analysis_for: "👤 Analysis for",
+    activity_impact: "🏃‍♂️ Today's Activity Impact",
+    weather_in: "✅ Weather in",
+    total_nutrients: "📊 Total Nutrients:",
+    deficient_nutrients: "🧩 Deficient Nutrients:",
+    no_deficiencies: "No deficiencies detected! 🎉",
+    recommendations: "🍴 Recommendations:",
+    activity_adjustments: "💪 Activity-Based Nutrition Adjustments",
+    activity_level: "Activity Level:",
+    extra_calories: "Extra Calories Needed:",
+    extra_protein: "Extra Protein Needed:",
+    extra_carbs: "Extra Carbs Needed:",
+    hydration: "Recommended Hydration:",
+    personalized_recommendations: "📋 Personalized Recommendations:",
+    // Progress prediction
+    health_progress: "📊 Health Progress Prediction for",
+    daily_intake: "Daily Intake",
+    recommended_tdee: "Recommended (TDEE)",
+    daily_difference: "Daily Difference",
+    calories: "calories",
+    progress_suffix: "Progress",
+    days: "days",
+    weight: "Weight",
+    blood_sugar_label: "Blood Sugar",
+    blood_pressure: "Blood Pressure",
+    cholesterol_label: "Cholesterol",
+    current: "Current",
+    predicted: "Predicted",
+    change: "Change",
+    overall_recommendation: "💡 Personalized Recommendation",
+    // Grocery list
+    grocery_list_for: "🛒 Personalized Grocery List for",
+    // Messages
+    analyzing: "⏳ Analyzing nutrition...",
+    predicting: "⏳ Predicting your health progress...",
+    generating_grocery: "⏳ Generating personalized grocery list for",
+    error: "❌ Error:",
+    fitness_connected: "✅ Google Fit connected successfully! Your activity data is now synced.",
+    analysis_complete: "✅ Analysis complete for",
+    activity_factored: "Your activity data has been factored into your nutrition recommendations.",
+    ask_anything: "Ask me anything about your diet!",
+    analyze_first: "Please analyze your nutrition first before asking questions!",
+    typing: "AI is typing...",
+    error_connecting: "Error connecting to AI service:",
+    // Alerts
+    enter_name_alert: "Please enter your name!",
+    fill_required_alert: "Please fill in all required fields (Name, Age, Height, Weight, City)!",
+    add_food_alert: "Please add at least one food item!",
+    keep_one_food: "You must have at least one food item!",
+    // Chat suggestions
+    breakfast_question: "What should I eat for breakfast?",
+    meal_plan_question: "Suggest a meal plan",
+    protein_question: "How to improve protein intake?",
+    // Nutrient names
+    calories_kcal: "Calories",
+    protein_g: "Protein",
+    carbs_g: "Carbs",
+    fats_g: "Fats",
+    fiber_g: "Fiber",
+    calcium_mg: "Calcium",
+    iron_mg: "Iron",
+    vitamin_c_mg: "Vitamin C",
+    vitamin_d_mcg: "Vitamin D",
+    need_more: "need {amount} more",
+    refresh_data: "🔄 Refresh Data",
+    fit_connected_title: "✅ Google Fit Connected",
+    fit_connected_desc: "Your activity data is synced and being used for recommendations",
+    kg: "kg",
+    mg_dl: "mg/dL",
+    mmhg: "mmHg",
+    kcal: "kcal",
+    ml: "ml",
+    g: "g"
+  },
+  hi: {
+    app_title: "🥗 न्यूट्रीगार्ड एआई",
+    app_subtitle: "स्मार्ट पोषण, फिटनेस ट्रैकिंग और स्वास्थ्य प्रगति",
+    fitness_connect_title: "🏃‍♂️ गूगल फिट कनेक्ट करें",
+    fitness_connect_desc: "व्यक्तिगत पोषण सिफारिशों के लिए अपनी गतिविधि डेटा सिंक करें",
+    connect_now: "अभी कनेक्ट करें",
+    today_activity: "📊 आज की गतिविधि",
+    steps: "कदम",
+    calories_burned: "कैलोरी बर्न",
+    distance_km: "दूरी (किमी)",
+    active_minutes: "सक्रिय मिनट",
+    calculating: "गणना हो रही है...",
+    health_profile: "👤 आपकी स्वास्थ्य प्रोफ़ाइल",
+    personal_info: "व्यक्तिगत जानकारी",
+    full_name: "पूरा नाम *",
+    enter_name: "अपना नाम दर्ज करें",
+    age: "उम्र *",
+    gender: "लिंग *",
+    male: "पुरुष ♂️",
+    female: "महिला ♀️",
+    other: "अन्य",
+    height_cm: "ऊंचाई (सेमी) *",
+    weight_kg: "वजन (किलो) *",
+    city: "शहर *",
+    enter_city: "अपना शहर दर्ज करें",
+    health_goal: "स्वास्थ्य लक्ष्य *",
+    weight_loss: "🔥 वजन घटाना",
+    weight_gain: "💪 वजन बढ़ाना",
+    weight_maintenance: "⚖️ वजन बनाए रखना",
+    health_metrics: "स्वास्थ्य मेट्रिक्स (वैकल्पिक)",
+    systolic_bp: "सिस्टोलिक बीपी (mmHg)",
+    diastolic_bp: "डायस्टोलिक बीपी (mmHg)",
+    blood_sugar: "रक्त शर्करा (mg/dL)",
+    cholesterol: "कोलेस्ट्रॉल (mg/dL)",
+    food_analysis: "🍽️ आज का भोजन विश्लेषण",
+    tip_prefix: "💡 <strong>सुझाव:</strong>",
+    tip_text: " मात्रा ग्राम में है (जैसे, 200 ग्राम के लिए 200)। आपका पोषण आपकी गतिविधि स्तर के अनुसार समायोजित किया जाएगा!",
+    food_name: "भोजन का नाम (जैसे, चावल)",
+    qty_g: "मात्रा (ग्राम)",
+    remove: "हटाएं",
+    add_food: "➕ और भोजन जोड़ें",
+    analyze_nutrition: "🔍 पोषण विश्लेषण करें",
+    predict_progress: "📈 मेरी प्रगति की भविष्यवाणी करें",
+    generate_grocery: "🛒 किराने की सूची बनाएं",
+    ai_assistant: "🤖 एआई आहार विशेषज्ञ सहायक",
+    chat_welcome: "👋 नमस्ते! मैं आपका एआई आहार विशेषज्ञ हूं। व्यक्तिगत सलाह के लिए गूगल फिट कनेक्ट करें और अपने पोषण का विश्लेषण करें!",
+    breakfast_btn: "🍳 नाश्ता",
+    meal_plan_btn: "📋 भोजन योजना",
+    protein_btn: "💪 प्रोटीन",
+    chat_placeholder: "पोषण के बारे में पूछें...",
+    send: "भेजें",
+    sedentary: "😴 निष्क्रिय",
+    lightly_active: "🚶 हल्का सक्रिय",
+    moderately_active: "🏃 मध्यम सक्रिय",
+    very_active: "💪 बहुत सक्रिय",
+    analysis_for: "👤 विश्लेषण",
+    activity_impact: "🏃‍♂️ आज की गतिविधि प्रभाव",
+    weather_in: "✅ मौसम",
+    total_nutrients: "📊 कुल पोषक तत्व:",
+    deficient_nutrients: "🧩 कमी वाले पोषक तत्व:",
+    no_deficiencies: "कोई कमी नहीं मिली! 🎉",
+    recommendations: "🍴 सिफारिशें:",
+    activity_adjustments: "💪 गतिविधि-आधारित पोषण समायोजन",
+    activity_level: "गतिविधि स्तर:",
+    extra_calories: "अतिरिक्त कैलोरी आवश्यक:",
+    extra_protein: "अतिरिक्त प्रोटीन आवश्यक:",
+    extra_carbs: "अतिरिक्त कार्ब्स आवश्यक:",
+    hydration: "अनुशंसित हाइड्रेशन:",
+    personalized_recommendations: "📋 व्यक्तिगत सिफारिशें:",
+    health_progress: "📊 स्वास्थ्य प्रगति भविष्यवाणी",
+    daily_intake: "दैनिक सेवन",
+    recommended_tdee: "अनुशंसित (TDEE)",
+    daily_difference: "दैनिक अंतर",
+    calories: "कैलोरी",
+    progress_suffix: "प्रगति",
+    days: "दिन",
+    weight: "वजन",
+    blood_sugar_label: "रक्त शर्करा",
+    blood_pressure: "रक्तचाप",
+    cholesterol_label: "कोलेस्ट्रॉल",
+    current: "वर्तमान",
+    predicted: "अनुमानित",
+    change: "परिवर्तन",
+    overall_recommendation: "💡 व्यक्तिगत सिफारिश",
+    grocery_list_for: "🛒 व्यक्तिगत किराने की सूची",
+    analyzing: "⏳ पोषण विश्लेषण हो रहा है...",
+    predicting: "⏳ आपकी स्वास्थ्य प्रगति की भविष्यवाणी हो रही है...",
+    generating_grocery: "⏳ व्यक्तिगत किराने की सूची बनाई जा रही है",
+    error: "❌ त्रुटि:",
+    fitness_connected: "✅ गूगल फिट सफलतापूर्वक कनेक्ट हो गया! आपका गतिविधि डेटा अब सिंक हो गया है।",
+    analysis_complete: "✅ विश्लेषण पूर्ण",
+    activity_factored: "आपके गतिविधि डेटा को आपके पोषण सिफारिशों में शामिल किया गया है।",
+    ask_anything: "अपने आहार के बारे में कुछ भी पूछें!",
+    analyze_first: "कृपया प्रश्न पूछने से पहले अपने पोषण का विश्लेषण करें!",
+    typing: "एआई टाइप कर रहा है...",
+    error_connecting: "एआई सेवा से कनेक्ट करने में त्रुटि:",
+    enter_name_alert: "कृपया अपना नाम दर्ज करें!",
+    fill_required_alert: "कृपया सभी आवश्यक फील्ड भरें (नाम, उम्र, ऊंचाई, वजन, शहर)!",
+    add_food_alert: "कृपया कम से कम एक भोजन आइटम जोड़ें!",
+    keep_one_food: "आपके पास कम से कम एक भोजन आइटम होना चाहिए!",
+    breakfast_question: "नाश्ते में क्या खाना चाहिए?",
+    meal_plan_question: "भोजन योजना सुझाएं",
+    protein_question: "प्रोटीन सेवन कैसे बढ़ाएं?",
+    calories_kcal: "कैलोरी",
+    protein_g: "प्रोटीन",
+    carbs_g: "कार्ब्स",
+    fats_g: "वसा",
+    fiber_g: "फाइबर",
+    calcium_mg: "कैल्शियम",
+    iron_mg: "आयरन",
+    vitamin_c_mg: "विटामिन सी",
+    vitamin_d_mcg: "विटामिन डी",
+    need_more: "{amount} और चाहिए",
+    refresh_data: "🔄 डेटा रिफ्रेश करें",
+    fit_connected_title: "✅ गूगल फिट कनेक्टेड",
+    fit_connected_desc: "आपका गतिविधि डेटा सिंक है और सिफारिशों के लिए उपयोग किया जा रहा है",
+    kg: "किलो",
+    mg_dl: "mg/dL",
+    mmhg: "mmHg",
+    kcal: "कैलोरी",
+    ml: "मिली",
+    g: "ग्राम"
+  },
+  te: {
+    app_title: "🥗 న్యూట్రీగార్డ్ AI",
+    app_subtitle: "స్మార్ట్ పోషకాహారం, ఫిట్‌నెస్ ట్రాకింగ్ & ఆరోగ్య పురోగతి",
+    fitness_connect_title: "🏃‍♂️ గూగుల్ ఫిట్ కనెక్ట్ చేయండి",
+    fitness_connect_desc: "వ్యక్తిగత పోషకాహార సిఫార్సుల కోసం మీ యాక్టివిటీ డేటాను సింక్ చేయండి",
+    connect_now: "ఇప్పుడు కనెక్ట్ చేయండి",
+    today_activity: "📊 నేటి యాక్టివిటీ",
+    steps: "అడుగులు",
+    calories_burned: "కేలరీలు బర్న్",
+    distance_km: "దూరం (కి.మీ)",
+    active_minutes: "యాక్టివ్ నిమిషాలు",
+    calculating: "లెక్కిస్తోంది...",
+    health_profile: "👤 మీ ఆరోగ్య ప్రొఫైల్",
+    personal_info: "వ్యక్తిగత సమాచారం",
+    full_name: "పూర్తి పేరు *",
+    enter_name: "మీ పేరు నమోదు చేయండి",
+    age: "వయస్సు *",
+    gender: "లింగం *",
+    male: "పురుషుడు ♂️",
+    female: "స్త్రీ ♀️",
+    other: "ఇతర",
+    height_cm: "ఎత్తు (సెం.మీ) *",
+    weight_kg: "బరువు (కిలోలు) *",
+    city: "నగరం *",
+    enter_city: "మీ నగరం నమోదు చేయండి",
+    health_goal: "ఆరోగ్య లక్ష్యం *",
+    weight_loss: "🔥 బరువు తగ్గించడం",
+    weight_gain: "💪 బరువు పెంచడం",
+    weight_maintenance: "⚖️ బరువు నిర్వహించడం",
+    health_metrics: "ఆరోగ్య మెట్రిక్స్ (ఐచ్ఛికం)",
+    systolic_bp: "సిస్టోలిక్ BP (mmHg)",
+    diastolic_bp: "డయాస్టోలిక్ BP (mmHg)",
+    blood_sugar: "బ్లడ్ షుగర్ (mg/dL)",
+    cholesterol: "కొలెస్ట్రాల్ (mg/dL)",
+    food_analysis: "🍽️ నేటి ఆహార విశ్లేషణ",
+    tip_prefix: "💡 <strong>చిట్కా:</strong>",
+    tip_text: " పరిమాణం గ్రాములలో ఉంది (ఉదా., 200 గ్రాముల కోసం 200). మీ పోషకాహారం మీ యాక్టివిటీ స్థాయి ఆధారంగా సర్దుబాటు చేయబడుతుంది!",
+    food_name: "ఆహార పేరు (ఉదా., అన్నం)",
+    qty_g: "పరిమాణం (గ్రా)",
+    remove: "తొలగించు",
+    add_food: "➕ మరో ఆహారం జోడించండి",
+    analyze_nutrition: "🔍 పోషకాహార విశ్లేషణ చేయండి",
+    predict_progress: "📈 నా పురోగతిని అంచనా వేయండి",
+    generate_grocery: "🛒 కిరాణా జాబితాను రూపొందించండి",
+    ai_assistant: "🤖 AI డైటీషియన్ అసిస్టెంట్",
+    chat_welcome: "👋 నమస్కారం! నేను మీ AI డైటీషియన్. వ్యక్తిగత సలహా కోసం గూగుల్ ఫిట్ కనెక్ట్ చేసి మీ పోషకాహారాన్ని విశ్లేషించండి!",
+    breakfast_btn: "🍳 అల్పాహారం",
+    meal_plan_btn: "📋 భోజన ప్రణాళిక",
+    protein_btn: "💪 ప్రోటీన్",
+    chat_placeholder: "పోషకాహారం గురించి అడగండి...",
+    send: "పంపండి",
+    sedentary: "😴 నిష్క్రియ",
+    lightly_active: "🚶 తేలికగా చురుకైన",
+    moderately_active: "🏃 మధ్యస్తంగా చురుకైన",
+    very_active: "💪 చాలా చురుకైన",
+    analysis_for: "👤 విశ్లేషణ",
+    activity_impact: "🏃‍♂️ నేటి యాక్టివిటీ ప్రభావం",
+    weather_in: "✅ వాతావరణం",
+    total_nutrients: "📊 మొత్తం పోషకాలు:",
+    deficient_nutrients: "🧩 లోపం ఉన్న పోషకాలు:",
+    no_deficiencies: "ఎటువంటి లోపాలు లేవు! 🎉",
+    recommendations: "🍴 సిఫార్సులు:",
+    activity_adjustments: "💪 యాక్టివిటీ-ఆధారిత పోషకాహార సర్దుబాట్లు",
+    activity_level: "యాక్టివిటీ స్థాయి:",
+    extra_calories: "అదనపు కేలరీలు అవసరం:",
+    extra_protein: "అదనపు ప్రోటీన్ అవసరం:",
+    extra_carbs: "అదనపు కార్బ్స్ అవసరం:",
+    hydration: "సిఫార్సు చేయబడిన హైడ్రేషన్:",
+    personalized_recommendations: "📋 వ్యక్తిగత సిఫార్సులు:",
+    health_progress: "📊 ఆరోగ్య పురోగతి అంచనా",
+    daily_intake: "రోజువారీ తీసుకోవడం",
+    recommended_tdee: "సిఫార్సు చేయబడింది (TDEE)",
+    daily_difference: "రోజువారీ తేడా",
+    calories: "కేలరీలు",
+    progress_suffix: "పురోగతి",
+    days: "రోజులు",
+    weight: "బరువు",
+    blood_sugar_label: "బ్లడ్ షుగర్",
+    blood_pressure: "బ్లడ్ ప్రెజర్",
+    cholesterol_label: "కొలెస్ట్రాల్",
+    current: "ప్రస్తుతం",
+    predicted: "అంచనా",
+    change: "మార్పు",
+    overall_recommendation: "💡 వ్యక్తిగత సిఫార్సు",
+    grocery_list_for: "🛒 వ్యక్తిగత కిరాణా జాబితా",
+    analyzing: "⏳ పోషకాహార విశ్లేషణ చేస్తోంది...",
+    predicting: "⏳ మీ ఆరోగ్య పురోగతిని అంచనా వేస్తోంది...",
+    generating_grocery: "⏳ వ్యక్తిగత కిరాణా జాబితా రూపొందిస్తోంది",
+    error: "❌ లోపం:",
+    fitness_connected: "✅ గూగుల్ ఫిట్ విజయవంతంగా కనెక్ట్ చేయబడింది! మీ యాక్టివిటీ డేటా ఇప్పుడు సింక్ చేయబడింది.",
+    analysis_complete: "✅ విశ్లేషణ పూర్తయింది",
+    activity_factored: "మీ యాక్టివిటీ డేటా మీ పోషకాహార సిఫార్సులలో చేర్చబడింది.",
+    ask_anything: "మీ ఆహారం గురించి ఏదైనా అడగండి!",
+    analyze_first: "దయచేసి ప్రశ్నలు అడగడానికి ముందు మీ పోషకాహారాన్ని విశ్లేషించండి!",
+    typing: "AI టైప్ చేస్తోంది...",
+    error_connecting: "AI సేవకు కనెక్ట్ చేయడంలో లోపం:",
+    enter_name_alert: "దయచేసి మీ పేరు నమోదు చేయండి!",
+    fill_required_alert: "దయచేసి అన్ని అవసరమైన ఫీల్డ్‌లను పూరించండి (పేరు, వయస్సు, ఎత్తు, బరువు, నగరం)!",
+    add_food_alert: "దయచేసి కనీసం ఒక ఆహార వస్తువును జోడించండి!",
+    keep_one_food: "మీకు కనీసం ఒక ఆహార వస్తువు ఉండాలి!",
+    breakfast_question: "అల్పాహారంగా ఏమి తినాలి?",
+    meal_plan_question: "భోజన ప్రణాళికను సూచించండి",
+    protein_question: "ప్రోటీన్ తీసుకోవడం ఎలా మెరుగుపరచాలి?",
+    calories_kcal: "కేలరీలు",
+    protein_g: "ప్రోటీన్",
+    carbs_g: "కార్బ్స్",
+    fats_g: "కొవ్వులు",
+    fiber_g: "ఫైబర్",
+    calcium_mg: "కాల్షియం",
+    iron_mg: "ఐరన్",
+    vitamin_c_mg: "విటమిన్ సి",
+    vitamin_d_mcg: "విటమిన్ డి",
+    need_more: "{amount} మరింత అవసరం",
+    refresh_data: "🔄 డేటా రిఫ్రెష్ చేయండి",
+    fit_connected_title: "✅ గూగుల్ ఫిట్ కనెక్టెడ్",
+    fit_connected_desc: "మీ యాక్టివిటీ డేటా సింక్ చేయబడింది మరియు సిఫార్సుల కోసం ఉపయోగించబడుతోంది",
+    kg: "కిలోలు",
+    mg_dl: "mg/dL",
+    mmhg: "mmHg",
+    kcal: "కేలరీలు",
+    ml: "మి.లీ",
+    g: "గ్రాములు"
+  }
+};
+
 // Global variables
+let currentLang = 'en';
 let currentAnalysisData = null;
 let userProfile = null;
+let fitnessData = null;
 
-// Add food item
+// Language switching
+function changeLanguage(lang) {
+  currentLang = lang;
+  
+  // Update active button
+  document.querySelectorAll('.lang-btn').forEach(btn => {
+    btn.classList.remove('active');
+  });
+  event.target.classList.add('active');
+  
+  // Update all translatable elements
+  updateTranslations();
+}
+
+function t(key) {
+  return translations[currentLang][key] || translations['en'][key] || key;
+}
+
+function updateTranslations() {
+  // Update data-i18n elements
+  document.querySelectorAll('[data-i18n]').forEach(el => {
+    const key = el.getAttribute('data-i18n');
+    if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA') {
+      el.placeholder = t(key);
+    } else {
+      el.innerHTML = t(key);
+    }
+  });
+  
+  // Update data-i18n-placeholder elements
+  document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+    const key = el.getAttribute('data-i18n-placeholder');
+    el.placeholder = t(key);
+  });
+  
+  // Update select options
+  document.querySelectorAll('select option[data-i18n]').forEach(option => {
+    const key = option.getAttribute('data-i18n');
+    option.textContent = t(key);
+  });
+}
+
+// Check if fitness is already connected on page load
+window.addEventListener('DOMContentLoaded', async function() {
+  updateTranslations();
+  
+  const urlParams = new URLSearchParams(window.location.search);
+  if (urlParams.get('fitness_connected') === 'true') {
+    await loadFitnessData();
+    addChatMessage(t('fitness_connected'), 'bot');
+  }
+  
+  await checkFitnessConnection();
+});
+
+function connectGoogleFit() {
+  window.location.href = '/google_fit_login';
+}
+
+async function checkFitnessConnection() {
+  try {
+    const response = await fetch('/api/fitness_data');
+    if (response.ok) {
+      const result = await response.json();
+      if (result.authenticated && result.data) {
+        displayFitnessData(result.data);
+      }
+    }
+  } catch (error) {
+    console.log('Fitness not connected yet');
+  }
+}
+
+async function loadFitnessData() {
+  try {
+    const response = await fetch('/api/fitness_data');
+    const result = await response.json();
+    
+    if (result.authenticated && result.data) {
+      displayFitnessData(result.data);
+    } else {
+      console.log('Fitness data not available');
+    }
+  } catch (error) {
+    console.error('Error loading fitness data:', error);
+  }
+}
+
+function displayFitnessData(data) {
+  fitnessData = data;
+  
+  const banner = document.getElementById('fitness-banner');
+  banner.className = 'fitness-banner connected';
+  banner.innerHTML = `
+    <div class="fitness-banner-content">
+      <h3>${t('fit_connected_title')}</h3>
+      <p>${t('fit_connected_desc')}</p>
+    </div>
+    <button class="fitness-connect-btn connected" onclick="loadFitnessData()">
+      ${t('refresh_data')}
+    </button>
+  `;
+  
+  const statsDiv = document.getElementById('fitness-stats');
+  statsDiv.classList.add('visible');
+  
+  document.getElementById('steps-value').textContent = data.steps.toLocaleString();
+  document.getElementById('calories-value').textContent = Math.round(data.calories_burned);
+  document.getElementById('distance-value').textContent = data.distance;
+  document.getElementById('active-value').textContent = data.active_minutes;
+  
+  const badge = document.getElementById('activity-badge');
+  if (data.steps < 3000) {
+    badge.className = 'activity-badge sedentary';
+    badge.textContent = t('sedentary');
+  } else if (data.steps < 7000) {
+    badge.className = 'activity-badge light';
+    badge.textContent = t('lightly_active');
+  } else if (data.steps < 10000) {
+    badge.className = 'activity-badge moderate';
+    badge.textContent = t('moderately_active');
+  } else {
+    badge.className = 'activity-badge high';
+    badge.textContent = t('very_active');
+  }
+}
+
 function addFood() {
   const list = document.getElementById("food-list");
   const div = document.createElement("div");
   div.className = "food-item";
   div.innerHTML = `
-    <input type="text" placeholder="Food name" class="food-name">
-    <input type="number" placeholder="Qty (g)" class="food-qty" min="1" value="100">
-    <button onclick="removeFood(this)">Remove</button>
+    <input type="text" placeholder="${t('food_name')}" class="food-name">
+    <input type="number" placeholder="${t('qty_g')}" class="food-qty" min="1" value="100">
+    <button onclick="removeFood(this)">${t('remove')}</button>
   `;
   list.appendChild(div);
 }
 
-// Remove food item
 function removeFood(btn) {
   const items = document.querySelectorAll('.food-item');
   if (items.length > 1) {
     btn.parentElement.remove();
   } else {
-    alert('You must have at least one food item!');
+    alert(t('keep_one_food'));
   }
 }
 
-// Get user profile data
 function getUserProfile() {
   return {
     name: document.getElementById('name').value.trim(),
@@ -851,7 +1579,6 @@ function getUserProfile() {
   };
 }
 
-// Get food items
 function getFoodItems() {
   const foodNames = document.querySelectorAll(".food-name");
   const foodQtys = document.querySelectorAll(".food-qty");
@@ -864,21 +1591,36 @@ function getFoodItems() {
   return items;
 }
 
-// Validate required fields
 function validateProfile() {
   const profile = getUserProfile();
   if (!profile.name) {
-    alert('Please enter your name!');
+    alert(t('enter_name_alert'));
     return false;
   }
   if (!profile.age || !profile.height || !profile.weight || !profile.city) {
-    alert('Please fill in all required fields (Name, Age, Height, Weight, City)!');
+    alert(t('fill_required_alert'));
     return false;
   }
   return true;
 }
 
-// Analyze Nutrition
+function translateNutrient(key) {
+  const nutrientMap = {
+    'Calories': 'calories_kcal',
+    'Protein': 'protein_g',
+    'Carbs': 'carbs_g',
+    'Fats': 'fats_g',
+    'Fiber': 'fiber_g',
+    'Calcium': 'calcium_mg',
+    'Iron': 'iron_mg',
+    'Vitamin C': 'vitamin_c_mg',
+    'Vitamin D': 'vitamin_d_mcg'
+  };
+  
+  const translationKey = nutrientMap[key];
+  return translationKey ? t(translationKey) : key;
+}
+
 async function analyzeNutrition() {
   if (!validateProfile()) return;
 
@@ -886,19 +1628,19 @@ async function analyzeNutrition() {
   const items = getFoodItems();
 
   if (items.length === 0) {
-    alert('Please add at least one food item!');
+    alert(t('add_food_alert'));
     return;
   }
 
   const payload = {
     ...userProfile,
     items,
-    lang: 'en'
+    lang: currentLang
   };
 
   const outEl = document.getElementById("nutrition-output");
   outEl.className = "output-section visible";
-  outEl.innerHTML = `<p>⏳ Analyzing nutrition...</p>`;
+  outEl.innerHTML = `<p>${t('analyzing')}</p>`;
 
   try {
     const res = await fetch("/analyze", {
@@ -909,48 +1651,80 @@ async function analyzeNutrition() {
     const data = await res.json();
     
     if (data.error) {
-      outEl.innerHTML = `<p style="color:red;">❌ ${data.error}</p>`;
+      outEl.innerHTML = `<p style="color:red;">${t('error')} ${data.error}</p>`;
       return;
     }
     
     currentAnalysisData = data;
     
-    let html = `<h3>👤 Analysis for ${userProfile.name}</h3>`;
-    html += `<h3>✅ Weather in ${userProfile.city}</h3>`;
+    let html = `<h3>${t('analysis_for')} ${userProfile.name}</h3>`;
+    
+    if (data.fitness_data && !data.fitness_data.error) {
+      html += `<h3>${t('activity_impact')}</h3>`;
+      html += `<p>📊 ${t('steps')}: ${data.fitness_data.steps.toLocaleString()} | 🔥 ${t('calories_burned')}: ${Math.round(data.fitness_data.calories_burned)} ${t('kcal')} | 📏 ${t('distance_km')}: ${data.fitness_data.distance} ${currentLang === 'hi' ? 'किमी' : currentLang === 'te' ? 'కి.మీ' : 'km'}</p>`;
+    }
+    
+    html += `<h3>${t('weather_in')} ${userProfile.city}</h3>`;
     html += `<p>🌤 ${data.weather.condition}, 🌡 ${data.weather.temp}°C, 💧 ${data.weather.humidity}%</p>`;
     
-    html += `<h3>📊 Total Nutrients:</h3><ul>`;
+    html += `<h3>${t('total_nutrients')}</h3><ul>`;
     for (const [k, v] of Object.entries(data.total_nutrients)) {
-      html += `<li><strong>${k}:</strong> ${v}</li>`;
+      html += `<li><strong>${translateNutrient(k)}:</strong> ${v}</li>`;
     }
     html += `</ul>`;
     
-    html += `<h3>🧩 Deficient Nutrients:</h3><ul>`;
+    html += `<h3>${t('deficient_nutrients')}</h3><ul>`;
     if (Object.keys(data.deficient).length > 0) {
       for (const [k, v] of Object.entries(data.deficient)) {
-        html += `<li><strong>${k}:</strong> need ${v} more</li>`;
+        const needMore = t('need_more').replace('{amount}', v);
+        html += `<li><strong>${translateNutrient(k)}:</strong> ${needMore}</li>`;
       }
     } else {
-      html += `<li>No deficiencies detected! 🎉</li>`;
+      html += `<li>${t('no_deficiencies')}</li>`;
     }
     html += `</ul>`;
     
-    html += `<h3>🍴 Recommendations:</h3><ul>`;
+    html += `<h3>${t('recommendations')}</h3><ul>`;
     data.recommendations.forEach(item => {
       html += `<li>${item[0]} — ${item[1]}</li>`;
     });
     html += `</ul>`;
     
+    if (data.adjusted_nutrition) {
+      html += `
+        <div class="adjusted-nutrition">
+          <h3>${t('activity_adjustments')}</h3>
+          <p><strong>${t('activity_level')}</strong> ${data.adjusted_nutrition.activity_level}</p>
+          <p><strong>${t('extra_calories')}</strong> +${data.adjusted_nutrition.extra_calories_needed} ${t('kcal')}</p>
+          <p><strong>${t('extra_protein')}</strong> +${data.adjusted_nutrition.extra_protein_g}${t('g')}</p>
+          <p><strong>${t('extra_carbs')}</strong> +${data.adjusted_nutrition.extra_carbs_g}${t('g')}</p>
+          <p><strong>${t('hydration')}</strong> ${data.adjusted_nutrition.hydration_ml}${t('ml')}</p>
+          
+          <div class="nutrition-recommendations">
+            <h4>${t('personalized_recommendations')}</h4>
+            <ul>
+              ${data.adjusted_nutrition.recommendations.map(rec => `<li>${rec}</li>`).join('')}
+            </ul>
+          </div>
+        </div>
+      `;
+    }
+    
     outEl.innerHTML = html;
     
-    addChatMessage(`✅ Analysis complete for ${userProfile.name}! I now have your nutrition data. Ask me anything about your diet!`, 'bot');
+    let chatMsg = `${t('analysis_complete')} ${userProfile.name}!`;
+    if (data.fitness_data && !data.fitness_data.error) {
+      chatMsg += ` ${t('activity_factored')}`;
+    }
+    chatMsg += ` ${t('ask_anything')}`;
+    
+    addChatMessage(chatMsg, 'bot');
     
   } catch (err) {
-    outEl.innerHTML = `<p style="color:red;">❌ ${err.message}</p>`;
+    outEl.innerHTML = `<p style="color:red;">${t('error')} ${err.message}</p>`;
   }
 }
 
-// Predict Progress (Multi-Timeline)
 async function predictProgress() {
   if (!validateProfile()) return;
 
@@ -958,13 +1732,13 @@ async function predictProgress() {
   const items = getFoodItems();
 
   if (items.length === 0) {
-    alert('Please add at least one food item!');
+    alert(t('add_food_alert'));
     return;
   }
 
   const outEl = document.getElementById("progress-output");
   outEl.className = "progress-results visible";
-  outEl.innerHTML = `<div class="loading-spinner"></div><p style="text-align:center; margin-top: 10px;">⏳ Predicting your health progress...</p>`;
+  outEl.innerHTML = `<div class="loading-spinner"></div><p style="text-align:center; margin-top: 10px;">${t('predicting')}</p>`;
 
   try {
     const res = await fetch("/api/predict_progress", {
@@ -972,7 +1746,8 @@ async function predictProgress() {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         profile: userProfile,
-        food_items: items
+        food_items: items,
+        lang: currentLang
       })
     });
     
@@ -983,144 +1758,143 @@ async function predictProgress() {
     const data = await res.json();
     
     if (!data.success) {
-      outEl.innerHTML = `<p style="color:red; text-align:center;">❌ ${data.error}</p>`;
+      outEl.innerHTML = `<p style="color:red; text-align:center;">${t('error')} ${data.error}</p>`;
       return;
     }
     
-    // Build the progress visualization
-    let html = `<h3>📊 Health Progress Prediction for ${userProfile.name}</h3>`;
+    let html = `<h3>${t('health_progress')} ${userProfile.name}</h3>`;
     
-    // Calorie Summary
+    if (data.fitness_impact) {
+      html += `<p style="text-align:center; background: rgba(255,255,255,0.2); padding: 10px; border-radius: 8px; margin-bottom: 15px;">
+        🏃‍♂️ ${t('activity_factored')} (${data.fitness_impact.steps} ${t('steps')}, ${Math.round(data.fitness_impact.calories_burned)} ${t('kcal')} ${currentLang === 'hi' ? 'बर्न' : currentLang === 'te' ? 'బర్న్' : 'burned'})
+      </p>`;
+    }
+    
     html += `
       <div class="calorie-summary">
         <div class="calorie-item">
-          <p>Daily Intake</p>
+          <p>${t('daily_intake')}</p>
           <div class="calorie-value">${Math.round(data.daily_calories)}</div>
-          <p>calories</p>
+          <p>${t('calories')}</p>
         </div>
         <div class="calorie-item">
-          <p>Recommended (TDEE)</p>
+          <p>${t('recommended_tdee')}</p>
           <div class="calorie-value">${Math.round(data.tdee)}</div>
-          <p>calories</p>
+          <p>${t('calories')}</p>
         </div>
         <div class="calorie-item">
-          <p>Daily Difference</p>
+          <p>${t('daily_difference')}</p>
           <div class="calorie-value">${data.calorie_diff > 0 ? '+' : ''}${Math.round(data.calorie_diff)}</div>
-          <p>calories</p>
+          <p>${t('calories')}</p>
         </div>
       </div>
     `;
     
-    // Timeline Cards
     html += `<div class="timeline-container">`;
     
     data.timelines.forEach(timeline => {
       html += `
         <div class="timeline-card">
           <div class="timeline-header">
-            <div class="timeline-title">${timeline.period} Progress</div>
-            <div class="timeline-badge">${timeline.days} days</div>
+            <div class="timeline-title">${timeline.period} ${t('progress_suffix')}</div>
+            <div class="timeline-badge">${timeline.days} ${t('days')}</div>
           </div>
           
           <div class="metrics-grid">
-            <!-- Weight -->
             <div class="metric-card ${timeline.weight.status}">
               <div class="metric-header">
                 <div class="metric-name">
                   <svg class="metric-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 6l3 1m0 0l-3 9a5.002 5.002 0 006.001 0M6 7l3 9M6 7l6-2m6 2l3-1m-3 1l-3 9a5.002 5.002 0 006.001 0M18 7l3 9m-3-9l-6-2m0-2v2m0 16V5m0 16H9m3 0h3"></path>
                   </svg>
-                  <span>Weight</span>
+                  <span>${t('weight')}</span>
                 </div>
                 <div>${timeline.weight.change > 0 ? '📈' : timeline.weight.change < 0 ? '📉' : '➡️'}</div>
               </div>
               <div class="metric-values">
                 <div class="metric-value">
-                  <div class="metric-label">Current</div>
-                  <div class="metric-number">${timeline.weight.current} kg</div>
+                  <div class="metric-label">${t('current')}</div>
+                  <div class="metric-number">${timeline.weight.current} ${t('kg')}</div>
                 </div>
                 <div class="metric-arrow">→</div>
                 <div class="metric-value">
-                  <div class="metric-label">Predicted</div>
-                  <div class="metric-number">${timeline.weight.predicted} kg</div>
+                  <div class="metric-label">${t('predicted')}</div>
+                  <div class="metric-number">${timeline.weight.predicted} ${t('kg')}</div>
                 </div>
               </div>
-              <div class="metric-change">Change: ${timeline.weight.change > 0 ? '+' : ''}${timeline.weight.change} kg</div>
+              <div class="metric-change">${t('change')}: ${timeline.weight.change > 0 ? '+' : ''}${timeline.weight.change} ${t('kg')}</div>
             </div>
             
-            <!-- Blood Sugar -->
             <div class="metric-card ${timeline.blood_sugar.status}">
               <div class="metric-header">
                 <div class="metric-name">
                   <svg class="metric-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4"></path>
                   </svg>
-                  <span>Blood Sugar</span>
+                  <span>${t('blood_sugar_label')}</span>
                 </div>
                 <div>${timeline.blood_sugar.change > 0 ? '📈' : timeline.blood_sugar.change < 0 ? '📉' : '➡️'}</div>
               </div>
               <div class="metric-values">
                 <div class="metric-value">
-                  <div class="metric-label">Current</div>
+                  <div class="metric-label">${t('current')}</div>
                   <div class="metric-number">${timeline.blood_sugar.current}</div>
                 </div>
                 <div class="metric-arrow">→</div>
                 <div class="metric-value">
-                  <div class="metric-label">Predicted</div>
+                  <div class="metric-label">${t('predicted')}</div>
                   <div class="metric-number">${timeline.blood_sugar.predicted}</div>
                 </div>
               </div>
-              <div class="metric-change">Change: ${timeline.blood_sugar.change > 0 ? '+' : ''}${timeline.blood_sugar.change} mg/dL</div>
+              <div class="metric-change">${t('change')}: ${timeline.blood_sugar.change > 0 ? '+' : ''}${timeline.blood_sugar.change} ${t('mg_dl')}</div>
             </div>
             
-            <!-- Blood Pressure -->
             <div class="metric-card ${timeline.blood_pressure.status}">
               <div class="metric-header">
                 <div class="metric-name">
                   <svg class="metric-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path>
                   </svg>
-                  <span>Blood Pressure</span>
+                  <span>${t('blood_pressure')}</span>
                 </div>
                 <div>${timeline.blood_pressure.change_sys > 0 ? '📈' : timeline.blood_pressure.change_sys < 0 ? '📉' : '➡️'}</div>
               </div>
               <div class="metric-values">
                 <div class="metric-value">
-                  <div class="metric-label">Current</div>
+                  <div class="metric-label">${t('current')}</div>
                   <div class="metric-number">${timeline.blood_pressure.current}</div>
                 </div>
                 <div class="metric-arrow">→</div>
                 <div class="metric-value">
-                  <div class="metric-label">Predicted</div>
+                  <div class="metric-label">${t('predicted')}</div>
                   <div class="metric-number">${timeline.blood_pressure.predicted}</div>
                 </div>
               </div>
-              <div class="metric-change">Change: ${timeline.blood_pressure.change_sys > 0 ? '+' : ''}${timeline.blood_pressure.change_sys}/${timeline.blood_pressure.change_dia > 0 ? '+' : ''}${timeline.blood_pressure.change_dia} mmHg</div>
+              <div class="metric-change">${t('change')}: ${timeline.blood_pressure.change_sys > 0 ? '+' : ''}${timeline.blood_pressure.change_sys}/${timeline.blood_pressure.change_dia > 0 ? '+' : ''}${timeline.blood_pressure.change_dia} ${t('mmhg')}</div>
             </div>
             
-            <!-- Cholesterol -->
             <div class="metric-card ${timeline.cholesterol.status}">
               <div class="metric-header">
                 <div class="metric-name">
                   <svg class="metric-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
                   </svg>
-                  <span>Cholesterol</span>
+                  <span>${t('cholesterol_label')}</span>
                 </div>
                 <div>${timeline.cholesterol.change > 0 ? '📈' : timeline.cholesterol.change < 0 ? '📉' : '➡️'}</div>
               </div>
               <div class="metric-values">
                 <div class="metric-value">
-                  <div class="metric-label">Current</div>
+                  <div class="metric-label">${t('current')}</div>
                   <div class="metric-number">${timeline.cholesterol.current}</div>
                 </div>
                 <div class="metric-arrow">→</div>
                 <div class="metric-value">
-                  <div class="metric-label">Predicted</div>
+                  <div class="metric-label">${t('predicted')}</div>
                   <div class="metric-number">${timeline.cholesterol.predicted}</div>
                 </div>
               </div>
-              <div class="metric-change">Change: ${timeline.cholesterol.change > 0 ? '+' : ''}${timeline.cholesterol.change} mg/dL</div>
+              <div class="metric-change">${t('change')}: ${timeline.cholesterol.change > 0 ? '+' : ''}${timeline.cholesterol.change} ${t('mg_dl')}</div>
             </div>
           </div>
         </div>
@@ -1129,25 +1903,21 @@ async function predictProgress() {
     
     html += `</div>`;
     
-    // Overall Recommendation
     html += `
       <div class="overall-recommendation">
-        <h4>💡 Personalized Recommendation</h4>
+        <h4>${t('overall_recommendation')}</h4>
         <p>${data.overall_message}</p>
       </div>
     `;
     
     outEl.innerHTML = html;
-    
-    // Scroll to results
     outEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
     
   } catch (err) {
-    outEl.innerHTML = `<p style="color:red; text-align:center;">❌ Error: ${err.message}</p>`;
+    outEl.innerHTML = `<p style="color:red; text-align:center;">${t('error')} ${err.message}</p>`;
   }
 }
 
-// Generate Grocery List
 async function generateGroceryList() {
   if (!validateProfile()) return;
 
@@ -1155,13 +1925,13 @@ async function generateGroceryList() {
 
   const outEl = document.getElementById("grocery-output");
   outEl.className = "grocery-results visible";
-  outEl.innerHTML = `<div class="loading-spinner"></div><p style="text-align:center; margin-top: 10px;">⏳ Generating personalized grocery list for ${userProfile.name}...</p>`;
+  outEl.innerHTML = `<div class="loading-spinner"></div><p style="text-align:center; margin-top: 10px;">${t('generating_grocery')} ${userProfile.name}...</p>`;
 
   try {
     const res = await fetch("/api/generate_grocery_list", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(userProfile)
+      body: JSON.stringify({...userProfile, lang: currentLang})
     });
     
     if (!res.ok) {
@@ -1170,7 +1940,7 @@ async function generateGroceryList() {
 
     const data = await res.json();
     
-    let html = `<h3>🛒 Personalized Grocery List for ${userProfile.name}</h3>`;
+    let html = `<h3>${t('grocery_list_for')} ${userProfile.name}</h3>`;
     
     if (data.grocery_list && data.grocery_list.length > 0) {
       const categories = {};
@@ -1201,11 +1971,10 @@ async function generateGroceryList() {
     outEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
     
   } catch (err) {
-    outEl.innerHTML = `<p style="color:red; text-align:center;">❌ Error: ${err.message}</p>`;
+    outEl.innerHTML = `<p style="color:red; text-align:center;">${t('error')} ${err.message}</p>`;
   }
 }
 
-// Chat functionality
 function toggleChat() {
   const widget = document.getElementById('chat-widget');
   widget.classList.toggle('minimized');
@@ -1230,14 +1999,14 @@ async function sendChatMessage() {
   if (!message) return;
 
   if (!currentAnalysisData) {
-    addChatMessage('Please analyze your nutrition first before asking questions!', 'bot');
+    addChatMessage(t('analyze_first'), 'bot');
     return;
   }
 
   addChatMessage(message, 'user');
   input.value = '';
 
-  const typingIndicator = addChatMessage('AI is typing...', 'bot');
+  const typingIndicator = addChatMessage(t('typing'), 'bot');
   typingIndicator.style.fontStyle = 'italic';
   typingIndicator.style.opacity = '0.7';
 
@@ -1249,7 +2018,7 @@ async function sendChatMessage() {
         message: message,
         analysis_data: currentAnalysisData,
         user_profile: userProfile,
-        lang: 'en'
+        lang: currentLang
       })
     });
 
@@ -1259,17 +2028,23 @@ async function sendChatMessage() {
     if (data.ok && data.reply) {
       addChatMessage(data.reply, 'bot');
     } else {
-      addChatMessage('Error: ' + (data.error || 'Unknown error'), 'bot');
+      addChatMessage(`${t('error')} ${data.error || 'Unknown error'}`, 'bot');
     }
   } catch (error) {
     typingIndicator.remove();
-    addChatMessage('Error connecting to AI service: ' + error.message, 'bot');
+    addChatMessage(`${t('error_connecting')} ${error.message}`, 'bot');
   }
 }
 
-function sendSuggestion(prompt) {
+function sendSuggestion(type) {
+  const questions = {
+    'breakfast': t('breakfast_question'),
+    'meal_plan': t('meal_plan_question'),
+    'protein': t('protein_question')
+  };
+  
   const input = document.getElementById('chat-input');
-  input.value = prompt;
+  input.value = questions[type] || type;
   sendChatMessage();
 }
 
